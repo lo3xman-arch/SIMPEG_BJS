@@ -1,1 +1,3345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMPEG — UPTD Puskesmas Bojongsari</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-50: #eef2ff;
+  --primary-100: #e0e7ff;
+  --secondary: #ec4899;
+  --accent: #06b6d4;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --info: #3b82f6;
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-muted: #f1f5f9;
+  --bg-sidebar: #0b1120;
+  --bg-sidebar-hover: rgba(255,255,255,0.04);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-white: #ffffff;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  --border-strong: #cbd5e1;
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow: 0 4px 6px -1px rgba(15,23,42,0.07), 0 2px 4px -2px rgba(15,23,42,0.05);
+  --shadow-md: 0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.05);
+  --shadow-xl: 0 25px 50px -12px rgba(15,23,42,0.25);
+  --shadow-glow: 0 0 40px rgba(99,102,241,0.15);
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ============ LOGIN PAGE ============ */
+#login-page {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999; overflow: hidden;
+}
+.login-bg-orbs {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.login-bg-orbs::before,
+.login-bg-orbs::after {
+  content: ''; position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.5;
+  animation: float 20s infinite ease-in-out;
+}
+.login-bg-orbs::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #8b5cf6, transparent);
+  top: -150px; left: -150px;
+}
+.login-bg-orbs::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #ec4899, transparent);
+  bottom: -200px; right: -200px;
+  animation-delay: -10s;
+}
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, -50px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.95); }
+}
+
+.login-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 70%);
+}
+
+.login-card {
+  position: relative; z-index: 2;
+  padding: 48px 44px; border-radius: var(--radius-2xl);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+  width: 440px; max-width: 92%;
+  animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.login-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, #6366f1, #ec4899, #06b6d4);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+.login-logo {
+  width: 76px; height: 76px; margin: 0 auto 24px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 20px 40px -10px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+  position: relative;
+}
+.login-logo::after {
+  content: ''; position: absolute; inset: -4px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  opacity: 0.3; filter: blur(12px); z-index: -1;
+}
+.login-logo svg { width: 38px; height: 38px; stroke: white; stroke-width: 2.2; }
+
+.login-brand {
+  text-align: center; margin-bottom: 32px;
+}
+.login-brand h1 {
+  font-weight: 800; font-size: 30px; letter-spacing: -1px;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px;
+}
+.login-brand .subtitle {
+  font-size: 12px; color: var(--text-muted); font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.login-brand .divider {
+  width: 40px; height: 3px; margin: 12px auto 0;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.login-input-group { position: relative; margin-bottom: 16px; }
+.login-input-group label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.login-input-group input {
+  width: 100%; padding: 14px 16px 14px 48px;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: 14px; transition: var(--transition);
+  background: var(--bg-surface); font-family: inherit;
+  color: var(--text-primary);
+}
+.login-input-group input:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+}
+.login-input-group i {
+  position: absolute; left: 16px; top: 40px;
+  width: 18px; height: 18px; stroke: var(--text-muted); stroke-width: 2;
+  transition: var(--transition);
+}
+.login-input-group input:focus ~ i,
+.login-input-group input:focus + i { stroke: var(--primary); }
+
+.btn-login {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: none; border-radius: var(--radius); font-weight: 700;
+  cursor: pointer; color: white; font-size: 14px;
+  transition: var(--transition);
+  box-shadow: 0 10px 25px -5px rgba(99,102,241,0.4);
+  margin-top: 12px; position: relative; overflow: hidden;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-login::before {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s;
+}
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(99,102,241,0.5);
+}
+.btn-login:hover::before { left: 100%; }
+.btn-login:active { transform: translateY(0); }
+
+.login-footer {
+  text-align: center; margin-top: 24px; padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px; color: var(--text-muted);
+}
+
+/* ============ APP LAYOUT ============ */
+#app { display: none; height: 100vh; overflow: hidden; }
+#app.active { display: flex; }
+
+/* ============ SIDEBAR ============ */
+#sidebar {
+  width: 270px; height: 100%;
+  background: linear-gradient(180deg, #0b1120 0%, #111827 100%);
+  transition: var(--transition-slow);
+  display: flex; flex-direction: column;
+  z-index: 100; position: relative;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+#sidebar.hidden { width: 0; overflow: hidden; }
+
+.sidebar-profile {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 12px;
+}
+.sidebar-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 16px;
+  box-shadow: 0 8px 16px -4px rgba(99,102,241,0.4);
+  flex-shrink: 0;
+}
+.sidebar-profile-info { flex: 1; min-width: 0; }
+.sidebar-profile-info .name {
+  color: var(--text-white); font-weight: 600; font-size: 13px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-profile-info .role {
+  color: var(--text-muted); font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; gap: 4px; margin-top: 2px;
+}
+.sidebar-profile-info .role::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--success); box-shadow: 0 0 8px var(--success);
+}
+
+.sidebar-brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.brand-title {
+  color: var(--text-white); font-size: 14px; font-weight: 700;
+  letter-spacing: -0.3px; line-height: 1.3;
+}
+.brand-title span {
+  display: block; color: var(--primary-light); font-size: 11px;
+  font-weight: 600; margin-top: 2px; letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1; padding: 16px 12px; overflow-y: auto;
+}
+.nav-label {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  padding: 12px 12px 8px; opacity: 0.7;
+}
+.menu-btn {
+  padding: 10px 12px; margin: 2px 0; border-radius: var(--radius);
+  background: transparent; cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; border: none; width: 100%;
+  text-align: left; gap: 12px; position: relative;
+  color: #cbd5e1; font-family: inherit;
+}
+.menu-btn::before {
+  content: ''; position: absolute; left: -12px; top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  height: 20px; width: 3px;
+  background: linear-gradient(180deg, var(--primary-light), var(--secondary));
+  border-radius: 0 3px 3px 0; transition: var(--transition);
+}
+.menu-btn svg {
+  width: 18px !important; height: 18px !important;
+  stroke: currentColor !important; stroke-width: 2px;
+  transition: var(--transition); flex-shrink: 0;
+  opacity: 0.7;
+}
+.menu-btn .menu-text {
+  font-size: 13.5px; font-weight: 500;
+  transition: var(--transition);
+}
+.menu-btn:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-white);
+}
+.menu-btn:hover svg { opacity: 1; }
+.menu-btn.active-menu {
+  background: linear-gradient(90deg, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0.05) 100%);
+  color: var(--text-white);
+}
+.menu-btn.active-menu::before { transform: translateY(-50%) scaleY(1); }
+.menu-btn.active-menu svg { stroke: var(--primary-light) !important; opacity: 1; }
+.menu-btn.active-menu .menu-text { color: var(--text-white); font-weight: 600; }
+
+.sidebar-footer {
+  padding: 12px; border-top: 1px solid rgba(255,255,255,0.06);
+}
+.btn-logout {
+  color: #fca5a5 !important;
+}
+.btn-logout svg { stroke: #fca5a5 !important; }
+.btn-logout:hover {
+  background: rgba(239,68,68,0.1);
+  color: #fecaca !important;
+}
+
+/* ============ MAIN CONTENT ============ */
+#main-wrapper {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0;
+}
+
+/* ============ TOP BAR ============ */
+.topbar {
+  height: 68px; background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 28px;
+  gap: 20px; flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+}
+.topbar-toggle {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: transparent; border: 1px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); color: var(--text-secondary);
+}
+.topbar-toggle:hover {
+  background: var(--bg-muted); color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+.topbar-toggle svg { width: 18px; height: 18px; stroke-width: 2; }
+
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb .current {
+  color: var(--text-primary); font-weight: 600;
+}
+.breadcrumb .separator { opacity: 0.5; }
+
+.topbar-search {
+  flex: 1; max-width: 420px; margin-left: auto;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%; padding: 9px 14px 9px 40px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-muted); font-size: 13px;
+  transition: var(--transition); font-family: inherit;
+}
+.topbar-search input:focus {
+  outline: none; border-color: var(--primary);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.topbar-search i {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  stroke: var(--text-muted); stroke-width: 2;
+}
+
+.topbar-actions {
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-icon-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: transparent; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); color: var(--text-secondary);
+  position: relative;
+}
+.topbar-icon-btn:hover { background: var(--bg-muted); color: var(--text-primary); }
+.topbar-icon-btn svg { width: 18px; height: 18px; stroke-width: 2; }
+.topbar-icon-btn .badge {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--danger); border: 2px solid var(--bg-surface);
+}
+
+.topbar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 12px 4px 4px; border-radius: 12px;
+  cursor: pointer; transition: var(--transition);
+  border: 1px solid transparent;
+}
+.topbar-user:hover { background: var(--bg-muted); border-color: var(--border); }
+.topbar-user-avatar {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 12px;
+}
+.topbar-user-info { line-height: 1.2; }
+.topbar-user-info .name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.topbar-user-info .role { font-size: 11px; color: var(--text-muted); }
+
+/* ============ MAIN CONTENT AREA ============ */
+#main-content {
+  flex: 1; overflow-y: auto; padding: 28px;
+  background: var(--bg-body);
+}
+.section { display: none; animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.active { display: block; }
+
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px; gap: 20px; flex-wrap: wrap;
+}
+.page-title {
+  font-size: 26px; font-weight: 800; color: var(--text-primary);
+  letter-spacing: -0.5px; margin-bottom: 4px; line-height: 1.2;
+}
+.page-subtitle { font-size: 13.5px; color: var(--text-secondary); font-weight: 400; }
+.page-actions { display: flex; gap: 10px; }
+
+/* ============ DASHBOARD ============ */
+.dashboard-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+.stat-card {
+  padding: 24px; border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: var(--transition); position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--card-accent, var(--primary));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
+.stat-card:hover::before { transform: scaleX(1); }
+
+.stat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--icon-bg, var(--primary-50));
+  transition: var(--transition);
+}
+.stat-card:hover .stat-icon { transform: scale(1.05) rotate(-5deg); }
+.stat-icon svg {
+  width: 22px; height: 22px;
+  stroke: var(--icon-color, var(--primary));
+  stroke-width: 2;
+}
+.stat-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  background: var(--trend-bg, var(--success-light));
+  color: var(--trend-color, var(--success));
+}
+.stat-trend svg { width: 12px; height: 12px; stroke-width: 2.5; }
+
+.stat-label {
+  font-size: 12px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+}
+.stat-value {
+  font-size: 34px; font-weight: 800; color: var(--text-primary);
+  line-height: 1; letter-spacing: -1px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.stat-footer {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.stat-card.indigo { --card-accent: linear-gradient(90deg, #6366f1, #8b5cf6); --icon-bg: #eef2ff; --icon-color: #6366f1; --trend-bg: #eef2ff; --trend-color: #6366f1; }
+.stat-card.emerald { --card-accent: linear-gradient(90deg, #10b981, #059669); --icon-bg: #d1fae5; --icon-color: #10b981; --trend-bg: #d1fae5; --trend-color: #059669; }
+.stat-card.purple { --card-accent: linear-gradient(90deg, #a855f7, #8b5cf6); --icon-bg: #f3e8ff; --icon-color: #a855f7; --trend-bg: #f3e8ff; --trend-color: #8b5cf6; }
+.stat-card.amber { --card-accent: linear-gradient(90deg, #f59e0b, #d97706); --icon-bg: #fef3c7; --icon-color: #d97706; --trend-bg: #fef3c7; --trend-color: #d97706; }
+
+/* Category Cards */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 28px 0 16px;
+}
+.section-title {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::before {
+  content: ''; width: 4px; height: 16px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.category-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.category-card {
+  padding: 18px 16px; border-radius: var(--radius);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 12px;
+  transition: var(--transition); cursor: pointer;
+  position: relative; overflow: hidden;
+}
+.category-card::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--cat-color, var(--primary));
+  opacity: 0.08; transform: translate(30%, -30%);
+  transition: var(--transition);
+}
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--cat-color, var(--primary));
+}
+.category-card:hover::after { transform: translate(20%, -20%) scale(1.3); }
+
+.category-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cat-color, var(--primary));
+  color: white;
+  box-shadow: 0 4px 12px -2px rgba(0,0,0,0.15);
+}
+.category-icon svg { width: 20px !important; height: 20px !important; stroke: white !important; stroke-width: 2.2px !important; }
+.category-card h4 {
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.category-card p {
+  font-size: 24px; font-weight: 800; color: var(--text-primary);
+  line-height: 1; letter-spacing: -0.5px;
+}
+
+.cat-red { --cat-color: #ef4444; }
+.cat-blue { --cat-color: #3b82f6; }
+.cat-purple { --cat-color: #a855f7; }
+.cat-amber { --cat-color: #f59e0b; }
+.cat-cyan { --cat-color: #06b6d4; }
+.cat-emerald { --cat-color: #10b981; }
+.cat-pink { --cat-color: #ec4899; }
+.cat-indigo { --cat-color: #6366f1; }
+.cat-orange { --cat-color: #f97316; }
+.cat-teal { --cat-color: #14b8a6; }
+
+/* Charts */
+.dashboard-charts {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 20px; margin-top: 24px;
+}
+@media (max-width: 1024px) { .dashboard-charts { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--bg-surface); padding: 24px;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  transition: var(--transition);
+}
+.chart-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+.chart-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.chart-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.chart-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.chart-badge {
+  padding: 5px 12px; border-radius: 20px;
+  background: var(--primary-50); color: var(--primary);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; gap: 4px;
+}
+.chart-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--primary); animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* ============ FORMS ============ */
+.form-container {
+  background: var(--bg-surface); padding: 32px;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.form-section-title {
+  font-weight: 700; font-size: 13px; margin: 28px 0 20px 0;
+  padding-left: 14px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-primary); position: relative;
+  display: flex; align-items: center; gap: 10px;
+}
+.form-section-title::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 20px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+.form-section-title:first-child { margin-top: 0; }
+
+.form-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.form-group { display: flex; flex-direction: column; }
+.form-group label {
+  font-size: 12px; margin-bottom: 6px; font-weight: 600;
+  color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.form-group label.required::after { content: ' *'; color: var(--danger); }
+input, select, textarea {
+  padding: 11px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg-surface);
+  outline: none; font-size: 13.5px; color: var(--text-primary);
+  transition: var(--transition); font-family: inherit;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+input::placeholder { color: var(--text-muted); }
+textarea { resize: vertical; min-height: 70px; }
+select { cursor: pointer; }
+.full-width { grid-column: 1 / -1; }
+
+.btn-primary {
+  padding: 13px 24px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: none; border-radius: var(--radius); font-weight: 700;
+  cursor: pointer; transition: var(--transition);
+  color: white; font-size: 13px;
+  box-shadow: 0 4px 12px -2px rgba(99,102,241,0.4);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: 0.3px; text-transform: uppercase;
+  font-family: inherit;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(99,102,241,0.5);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary.btn-block { width: 100%; margin-top: 24px; padding: 15px; }
+.btn-primary.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 12px -2px rgba(16,185,129,0.4);
+}
+.btn-primary.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 12px -2px rgba(239,68,68,0.4);
+  margin-top: 12px;
+}
+.btn-primary.btn-outline {
+  background: transparent; color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  box-shadow: none;
+}
+.btn-primary.btn-outline:hover {
+  background: var(--bg-muted); border-color: var(--border-strong);
+  transform: none; box-shadow: none;
+}
+
+/* ============ TABLE ============ */
+.table-utilities {
+  background: var(--bg-surface); padding: 16px 20px;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  margin-bottom: 16px;
+  display: flex; flex-wrap: wrap; gap: 16px;
+  align-items: center; justify-content: space-between;
+}
+.utility-group { display: flex; align-items: center; gap: 10px; }
+.utility-group label {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.utility-select {
+  padding: 9px 14px; border-radius: var(--radius-sm);
+  min-width: 180px; font-size: 13px;
+  border: 1.5px solid var(--border);
+  transition: var(--transition); font-family: inherit;
+  background: var(--bg-surface);
+}
+.utility-select:focus { border-color: var(--primary); outline: none; }
+
+.table-container {
+  overflow: auto; background: var(--bg-surface);
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  max-width: 100%; max-height: 70vh;
+}
+table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+th, td {
+  padding: 13px 16px; text-align: left; font-size: 13px;
+  white-space: nowrap;
+}
+th {
+  background: var(--bg-muted);
+  font-weight: 700; color: var(--text-secondary);
+  position: sticky; top: 0; z-index: 3;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  font-size: 11px; border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border-light);
+}
+tbody tr:hover { background: #fafbfc; }
+tbody tr:last-child { border-bottom: none; }
+tbody td { color: var(--text-primary); }
+tbody td b { color: var(--text-primary); font-weight: 700; }
+
+/* ===== Freeze Panes: tabel Data Pegawai (dipakai bersama untuk Semua Pegawai, Data ASN, Data PPPK, Data PJLP) =====
+   Baris judul (th) "position: sticky; top:0" di atas + .table-container sekarang punya tinggi terbatas
+   (max-height + overflow: auto) supaya benar-benar jadi area scroll -- ini yang membuat baris judul
+   bisa freeze. Bagian di bawah ini membekukan 4 kolom identitas paling kiri (⋮⋮, No, Aksi, Nama) supaya
+   tetap terlihat saat tabel digeser (scroll) ke kanan/kiri, sama seperti Freeze Panes di Excel/Google Sheets. */
+#view-section .table-container table th:nth-child(1),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(1) {
+  position: sticky; left: 0px; width: 44px; min-width: 44px; max-width: 44px;
+}
+#view-section .table-container table th:nth-child(2),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(2) {
+  position: sticky; left: 44px; width: 56px; min-width: 56px; max-width: 56px;
+}
+#view-section .table-container table th:nth-child(3),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(3) {
+  position: sticky; left: 100px; width: 130px; min-width: 130px; max-width: 130px;
+}
+#view-section .table-container table th:nth-child(4),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(4) {
+  position: sticky; left: 230px; width: 190px; min-width: 190px; max-width: 190px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Latar belakang solid supaya kolom yang digeser tidak "menembus" kolom beku */
+#view-section .table-container table tbody tr[data-nik] td:nth-child(1),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(2),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(3),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(4) {
+  background: var(--bg-surface);
+  z-index: 2;
+}
+/* Kolom judul beku harus di atas kolom judul biasa maupun baris data */
+#view-section .table-container table th:nth-child(1),
+#view-section .table-container table th:nth-child(2),
+#view-section .table-container table th:nth-child(3),
+#view-section .table-container table th:nth-child(4) {
+  z-index: 5;
+}
+/* Bayangan tipis di tepi kanan area beku, penanda batas freeze pane */
+#view-section .table-container table th:nth-child(4),
+#view-section .table-container table tbody tr[data-nik] td:nth-child(4) {
+  box-shadow: 4px 0 6px -2px rgba(15, 23, 42, 0.08);
+}
+/* Warna hover baris tetap konsisten pada kolom yang dibekukan */
+#view-section .table-container table tbody tr[data-nik]:hover td:nth-child(1),
+#view-section .table-container table tbody tr[data-nik]:hover td:nth-child(2),
+#view-section .table-container table tbody tr[data-nik]:hover td:nth-child(3),
+#view-section .table-container table tbody tr[data-nik]:hover td:nth-child(4) {
+  background: #fafbfc;
+}
+
+.drag-handle {
+  cursor: grab; font-size: 16px; user-select: none;
+  text-align: center; color: var(--text-muted);
+  transition: var(--transition); padding: 4px 8px;
+}
+.drag-handle:hover { color: var(--primary); }
+.drag-handle:active { cursor: grabbing; }
+tr.dragging {
+  background-color: var(--primary-50) !important;
+  opacity: 0.8; outline: 2px dashed var(--primary);
+}
+tr.drag-over { border-top: 3px solid var(--primary); }
+
+.action-icon {
+  width: 34px; height: 34px; margin-right: 6px; padding: 0;
+  display: inline-grid; place-items: center; vertical-align: middle;
+  border: 1px solid #dbe4ef; border-radius: 10px; cursor: pointer;
+  color: #0f766e; background: #f0fdfa; transition: var(--transition);
+  box-shadow: 0 2px 5px rgba(15, 23, 42, .05);
+}
+.action-icon svg { width: 16px; height: 16px; stroke-width: 2.2; }
+.action-icon:hover { color: #fff; background: #0f766e; border-color: #0f766e; transform: translateY(-2px); box-shadow: 0 7px 14px rgba(15, 118, 110, .23); }
+.action-icon:active { transform: translateY(0); }
+.action-icon.delete { color: #dc2626; background: #fff5f5; border-color: #fecaca; }
+.action-icon.delete:hover { color: #fff; background: #dc2626; border-color: #dc2626; box-shadow: 0 7px 14px rgba(220, 38, 38, .22); }
+.action-icon.mutasi { color: #7c3aed; background: #f5f3ff; border-color: #ddd6fe; }
+.action-icon.mutasi:hover { color: #fff; background: #7c3aed; border-color: #7c3aed; box-shadow: 0 7px 14px rgba(124,58,237,.22); }
+/* Status Badges */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.status-badge.asn { background: var(--success-light); color: #065f46; }
+.status-badge.pppk { background: #f3e8ff; color: #6b21a8; }
+.status-badge.pjlp { background: var(--warning-light); color: #92400e; }
+.cluster-menu .menu-text { font-size: 13px; }
+.cluster-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 9px; border-radius: 999px;
+  background: #ecfeff; color: #155e75;
+  font-size: 10.5px; font-weight: 700; border: 1px solid #a5f3fc;
+}
+.cluster-role-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 9px; border-radius: 999px;
+  background: #f5f3ff; color: #5b21b6;
+  font-size: 10.5px; font-weight: 700; border: 1px solid #ddd6fe;
+}
+
+/* ============ PROFILE ============ */
+.profile-card {
+  display: grid; grid-template-columns: 240px 1fr;
+  gap: 32px; background: var(--bg-surface); padding: 32px;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  margin-top: 20px;
+}
+.profile-avatar-box { text-align: center; }
+.profile-avatar-wrapper {
+  position: relative; width: 200px; height: 240px;
+  margin: 0 auto 16px;
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+.profile-avatar-wrapper::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.4));
+}
+.profile-avatar {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.profile-avatar-overlay {
+  position: absolute; bottom: 12px; left: 0; right: 0;
+  text-align: center; color: white; z-index: 2;
+}
+.profile-avatar-overlay .name {
+  font-size: 15px; font-weight: 700; margin-bottom: 2px;
+}
+.profile-avatar-overlay .role {
+  font-size: 11px; opacity: 0.9; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.profile-details { min-width: 0; }
+.profile-title {
+  font-size: 24px; font-weight: 800; color: var(--text-primary);
+  margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.profile-subtitle {
+  font-size: 13px; font-weight: 500; color: var(--text-muted);
+  margin-bottom: 24px;
+}
+.profile-info-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 4px 24px;
+}
+.info-item {
+  padding: 10px 0; border-bottom: 1px dashed var(--border);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.info-item span {
+  font-size: 10px; color: var(--text-muted);
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.info-item p { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+
+/* ============ TOAST ============ */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 10000;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  padding: 14px 18px; border-radius: var(--radius);
+  background: var(--bg-surface); box-shadow: var(--shadow-xl);
+  display: flex; align-items: center; gap: 12px;
+  min-width: 320px; max-width: 420px;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 4px solid var(--primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.toast.success .toast-icon { background: var(--success-light); }
+.toast.error .toast-icon { background: var(--danger-light); }
+.toast.warning .toast-icon { background: var(--warning-light); }
+.toast.info .toast-icon { background: var(--primary-50); }
+.toast-message {
+  flex: 1; font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+}
+.toast-close {
+  cursor: pointer; padding: 4px; border-radius: 6px;
+  transition: var(--transition); color: var(--text-muted);
+}
+.toast-close:hover { background: var(--bg-muted); color: var(--text-primary); }
+
+.spinner {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2.5px solid var(--primary-100); border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .topbar-search { display: none; }
+}
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed; left: 0; top: 0;
+    transform: translateX(-100%);
+  }
+  #sidebar:not(.hidden) { transform: translateX(0); }
+  #main-content { padding: 20px 16px; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .category-grid { grid-template-columns: repeat(2, 1fr); }
+  .profile-card { grid-template-columns: 1fr; text-align: center; }
+  .page-header { flex-direction: column; }
+}
+
+/* ============ PRINT ============ */
+@media print {
+  body { background: white; height: auto; overflow: visible; }
+  #sidebar, #login-page, .topbar, .btn-primary, .form-container, .table-utilities { display: none !important; }
+  #main-content { padding: 0; overflow: visible; }
+  .section { display: none !important; }
+  #view-section { display: block !important; }
+  .table-container { box-shadow: none; border: none; }
+  table { width: 100% !important; }
+  th, td { font-size: 10px !important; padding: 5px !important; }
+}
+
+
+/* ============ PROFESSIONAL ACCESS UPDATE ============ */
+body.employee-mode .admin-only,
+body.employee-mode #m-view-asn,
+body.employee-mode #m-view-pppk,
+body.employee-mode #m-view-pjlp,
+body.employee-mode #m-input-data,
+body.employee-mode #m-upload { display: none !important; }
+body.employee-mode #global-search { pointer-events: none; opacity: .72; }
+body.employee-mode .table-utilities button[onclick="saveNewOrder()"] { display: none !important; }
+body.employee-mode .drag-handle { visibility: hidden; cursor: default; }
+body.employee-mode #personal .form-container { display: none; }
+#login-page {
+  padding: 28px;
+  background: radial-gradient(circle at 8% 12%, rgba(45, 212, 191, .2), transparent 28%), radial-gradient(circle at 88% 85%, rgba(99, 102, 241, .24), transparent 32%), linear-gradient(125deg, #061521 0%, #0f2438 48%, #111b43 100%);
+}
+.login-card { display: grid; grid-template-columns: minmax(280px, 1.05fr) minmax(360px, .95fr); width: min(100%, 940px); max-width: 940px; min-height: 550px; padding: 0; overflow: hidden; border-radius: 28px; background: #fff; box-shadow: 0 32px 80px rgba(2, 6, 23, .46); }
+.login-card::before { display: none; }
+.login-showcase { position: relative; overflow: hidden; padding: 56px 48px; color: #f8fafc; background: linear-gradient(155deg, #0d9488 0%, #0f766e 46%, #1e3a8a 100%); display: flex; flex-direction: column; justify-content: space-between; }
+.login-showcase::before, .login-showcase::after { content: ''; position: absolute; border-radius: 999px; pointer-events: none; }
+.login-showcase::before { width: 290px; height: 290px; right: -115px; top: -80px; border: 46px solid rgba(255,255,255,.11); }
+.login-showcase::after { width: 190px; height: 190px; left: -90px; bottom: 50px; background: rgba(20, 184, 166, .3); filter: blur(5px); }
+.showcase-top, .showcase-copy, .showcase-note { position: relative; z-index: 1; }
+.showcase-top { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .06em; }
+.showcase-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22); }
+.showcase-mark svg { width: 24px; height: 24px; }
+.showcase-copy h2 { max-width: 360px; margin: 0 0 16px; font-size: clamp(30px, 3vw, 42px); line-height: 1.12; letter-spacing: -.045em; }
+.showcase-copy p { max-width: 340px; color: rgba(240, 253, 250, .82); font-size: 14px; line-height: 1.7; }
+.showcase-note { display: flex; align-items: center; gap: 9px; font-size: 12px; color: rgba(255,255,255,.76); }
+.showcase-note i { width: 16px; height: 16px; }
+.login-form-panel { padding: 48px 52px 38px; display: flex; flex-direction: column; justify-content: center; }
+.login-logo { width: 52px; height: 52px; margin: 0 0 24px; border-radius: 15px; box-shadow: 0 12px 24px -12px rgba(13, 148, 136, .8); }
+.login-logo::after { display: none; }
+.login-logo svg { width: 28px; height: 28px; }
+.login-brand { margin-bottom: 28px; text-align: left; }
+.login-brand h1 { color: #0f172a; background: none; -webkit-text-fill-color: initial; font-size: 27px; }
+.login-brand .subtitle { color: #64748b; text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; }
+.login-brand .divider { display: none; }
+.login-input-group { margin-bottom: 18px; }
+.login-input-group label { color: #334155; font-size: 11px; letter-spacing: .06em; }
+.login-input-group input { padding: 14px 46px 14px 46px; border-color: #dbe4ef; border-radius: 12px; background: #f8fafc; }
+.login-input-group input:hover { border-color: #94a3b8; }
+.login-input-group input:focus { background: #fff; border-color: #0d9488; box-shadow: 0 0 0 4px rgba(13, 148, 136, .12); }
+.login-input-group i { top: 38px; color: #64748b; }
+.login-input-group input:focus + i { stroke: #0d9488; }
+.password-toggle { position: absolute; right: 13px; top: 33px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; background: transparent; color: #64748b; cursor: pointer; }
+.password-toggle:hover { color: #0f766e; }
+.password-toggle svg { width: 18px; height: 18px; }
+.btn-login { margin-top: 8px; padding: 14px; border-radius: 12px; text-transform: none; letter-spacing: 0; background: linear-gradient(135deg, #0f766e, #0d9488); box-shadow: 0 12px 22px -10px rgba(13, 148, 136, .7); }
+.btn-login:hover { box-shadow: 0 16px 28px -10px rgba(13, 148, 136, .8); }
+.login-footer { margin-top: 25px; padding-top: 18px; font-size: 11px; text-align: left; }
+@media (max-width: 760px) { #login-page { padding: 16px; align-items: center; } .login-card { display: block; min-height: 0; max-width: 460px; } .login-showcase { display: none; } .login-form-panel { padding: 38px 30px 30px; } }
+@media (max-width: 390px) { .login-form-panel { padding: 32px 24px 25px; } }
+.login-logo, .sidebar-avatar, .topbar-user-avatar { background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 52%, #6366f1 100%); }
+#sidebar { background: linear-gradient(180deg, #061521 0%, #0f172a 58%, #111827 100%); }
+.stat-card, .chart-card, .category-card, .form-container, .table-container, .profile-card {
+  border: 1px solid rgba(148, 163, 184, .18);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, .08);
+}
+.menu-btn, .btn-primary { border-radius: 10px; }
+.employee-action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
+.employee-action-bar .btn-primary { padding: 10px 16px; }
+#foto-pegawai { padding: 10px; background: var(--bg-muted); }
+.notif-wrapper { position: relative; }
+.topbar-icon-btn .badge.count {
+  position: absolute; top: 2px; right: 2px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 20px; background: var(--danger);
+  color: #fff; font-size: 9px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg-surface); line-height: 1;
+}
+.notif-dropdown {
+  position: absolute; top: calc(100% + 10px); right: -8px;
+  width: 320px; max-width: 88vw;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+  z-index: 500; overflow: hidden; animation: fadeInUp 0.2s ease;
+}
+.notif-dropdown-header {
+  padding: 14px 16px; font-size: 12.5px; font-weight: 700;
+  color: var(--text-primary); border-bottom: 1px solid var(--border-light);
+  background: var(--bg-muted);
+}
+.notif-dropdown-list { max-height: 340px; overflow-y: auto; }
+.notif-item {
+  padding: 12px 16px; border-bottom: 1px solid var(--border-light);
+  display: flex; flex-direction: column; gap: 3px; cursor: pointer;
+  transition: var(--transition);
+}
+.notif-item:hover { background: var(--bg-muted); }
+.notif-item:last-child { border-bottom: none; }
+.notif-item .ni-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.notif-item .ni-sub { font-size: 11px; color: var(--text-muted); }
+.notif-item .ni-badge {
+  align-self: flex-start; margin-top: 2px;
+  padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700;
+}
+.notif-item.warn .ni-badge { background: var(--warning-light); color: #92400e; }
+.notif-item.danger .ni-badge { background: var(--danger-light); color: #991b1b; }
+.notif-empty { padding: 24px 16px; text-align: center; font-size: 12.5px; color: var(--text-muted); }
+
+@media screen and (max-width: 768px) {
+  .notif-dropdown { width: 90vw !important; right: -46px !important; }
+}
+
+
+/* =========================================================
+   MOBILE HARD FIX — SIMPEG UPTD PUSKESMAS BOJONGSARI
+   Ditambahkan PALING AKHIR agar mengalahkan CSS sebelumnya.
+   Tidak mengubah fungsi JavaScript / struktur data.
+   ========================================================= */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden !important;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+img, svg, canvas, video, iframe { max-width: 100%; }
+
+@media screen and (max-width: 768px) {
+  html {
+    width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    font-size: 13px;
+  }
+
+  #app {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #main-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Sidebar menjadi drawer yang tidak mengambil lebar layar utama */
+  #sidebar {
+    width: min(82vw, 280px) !important;
+    max-width: 280px !important;
+    min-width: 0 !important;
+    height: 100dvh !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    z-index: 1000 !important;
+    transform: translateX(-105%) !important;
+    box-shadow: 18px 0 40px rgba(2, 6, 23, .25) !important;
+  }
+
+  #sidebar:not(.hidden) { transform: translateX(0) !important; }
+  #sidebar.hidden { width: min(82vw, 280px) !important; overflow: visible !important; }
+
+  .topbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    padding: 0 10px !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .topbar-toggle {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+  }
+
+  .breadcrumb {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    gap: 5px !important;
+    font-size: 11px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+  .breadcrumb span { overflow: hidden; text-overflow: ellipsis; }
+
+  .topbar-actions { flex: 0 0 auto !important; gap: 2px !important; }
+  .topbar-icon-btn { width: 34px !important; height: 34px !important; }
+  .topbar-user { padding: 2px !important; }
+  .topbar-user-info { display: none !important; }
+  .topbar-user-avatar { width: 30px !important; height: 30px !important; }
+
+  #main-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px 10px 24px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .page-header {
+    width: 100% !important;
+    margin-bottom: 14px !important;
+    gap: 10px !important;
+    flex-direction: column !important;
+  }
+
+  .page-title {
+    font-size: clamp(20px, 6vw, 25px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: -.4px !important;
+  }
+  .page-subtitle { font-size: 11.5px !important; line-height: 1.45 !important; }
+  .page-actions { width: 100% !important; }
+  .page-actions .btn-primary { width: 100% !important; }
+
+  /* Dashboard statistik: 2 kolom di HP agar tidak memanjang dan tetap ringkas */
+  .dashboard-grid {
+    width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .stat-card {
+    min-width: 0 !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+  .stat-header { margin-bottom: 9px !important; }
+  .stat-icon { width: 34px !important; height: 34px !important; border-radius: 9px !important; }
+  .stat-icon svg { width: 17px !important; height: 17px !important; }
+  .stat-trend { padding: 3px 6px !important; font-size: 8px !important; gap: 2px !important; }
+  .stat-trend svg { width: 9px !important; height: 9px !important; }
+  .stat-label { font-size: 9px !important; margin-bottom: 4px !important; letter-spacing: .2px !important; }
+  .stat-value { font-size: clamp(23px, 7vw, 31px) !important; }
+  .stat-footer { margin-top: 7px !important; padding-top: 7px !important; font-size: 8.5px !important; gap: 3px !important; }
+  .stat-footer svg { width: 10px !important; height: 10px !important; }
+
+  .section-header { margin: 18px 0 9px !important; }
+  .section-title { font-size: 9px !important; letter-spacing: 1px !important; }
+  .section-title::before { width: 3px !important; height: 13px !important; }
+
+  /* Kategori: 2 kolom dengan ukuran yang benar-benar mengikuti HP */
+  .category-grid {
+    width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .category-card {
+    min-width: 0 !important;
+    padding: 11px !important;
+    gap: 7px !important;
+    border-radius: 10px !important;
+  }
+  .category-icon { width: 31px !important; height: 31px !important; border-radius: 8px !important; }
+  .category-icon svg { width: 16px !important; height: 16px !important; }
+  .category-card h4 { font-size: 9px !important; line-height: 1.25 !important; }
+  .category-card p { font-size: 19px !important; }
+
+  .dashboard-charts {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+  }
+  .chart-card {
+    min-width: 0 !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  .chart-header { margin-bottom: 10px !important; gap: 6px !important; }
+  .chart-title { font-size: 12px !important; }
+  .chart-subtitle { font-size: 9px !important; }
+  .chart-badge { padding: 4px 7px !important; font-size: 8px !important; }
+  .chart-card canvas { max-width: 100% !important; }
+
+  /* Form */
+  .form-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px !important;
+    margin-bottom: 14px !important;
+    border-radius: 12px !important;
+  }
+  .form-grid {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    gap: 11px !important;
+  }
+  .form-section-title { margin: 18px 0 11px !important; font-size: 10.5px !important; }
+  .form-section-title:first-child { margin-top: 0 !important; }
+  input, select, textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 10px 11px !important;
+    font-size: 13px !important;
+  }
+  textarea { min-height: 66px !important; }
+  .btn-primary { max-width: 100% !important; }
+  .btn-primary.btn-block { width: 100% !important; padding: 12px !important; margin-top: 14px !important; }
+
+  /* Pencarian */
+  #personal .form-container > div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  #personal .form-container > div[style*="display: flex"] button { width: 100% !important; }
+
+  /* Profil */
+  .profile-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: 14px !important;
+    text-align: left !important;
+  }
+  .profile-avatar-wrapper { width: 150px !important; height: 180px !important; }
+  .profile-title { font-size: 19px !important; }
+  .profile-subtitle { font-size: 11px !important; margin-bottom: 12px !important; }
+  .profile-info-grid {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .info-item[style*="grid-column"] { grid-column: auto !important; }
+  .info-item { padding: 8px 0 !important; }
+  .info-item span { font-size: 8.5px !important; }
+  .info-item p { font-size: 12px !important; overflow-wrap: anywhere !important; }
+
+  /* Daftar kartu pegawai yang dibuat via JS */
+  #personal-result > div[style*="grid-template-columns"] {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+  #personal-result .category-card { width: 100% !important; }
+
+  /* Utility/filter tabel */
+  .table-utilities {
+    width: 100% !important;
+    padding: 10px !important;
+    gap: 9px !important;
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  .table-utilities > div:first-child {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .utility-group { width: 100% !important; flex-direction: column !important; align-items: stretch !important; gap: 4px !important; }
+  .utility-select { width: 100% !important; min-width: 0 !important; font-size: 12px !important; }
+  .table-utilities > .btn-primary { width: 100% !important; }
+
+  /* Tabel: tetap lengkap, tetapi scroll horizontal di dalam kontainer */
+  .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 10px !important;
+  }
+  .table-container table {
+    width: max-content !important;
+    min-width: 900px !important;
+  }
+  .table-container th, .table-container td {
+    padding: 8px 10px !important;
+    font-size: 10px !important;
+  }
+
+  /* Freeze pane tetap bekerja tetapi diperkecil di HP */
+  #view-section .table-container table th:nth-child(1),
+  #view-section .table-container table tbody tr[data-nik] td:nth-child(1) {
+    width: 34px !important; min-width: 34px !important; max-width: 34px !important;
+  }
+  #view-section .table-container table th:nth-child(2),
+  #view-section .table-container table tbody tr[data-nik] td:nth-child(2) {
+    left: 34px !important; width: 42px !important; min-width: 42px !important; max-width: 42px !important;
+  }
+  #view-section .table-container table th:nth-child(3),
+  #view-section .table-container table tbody tr[data-nik] td:nth-child(3) {
+    left: 76px !important; width: 90px !important; min-width: 90px !important; max-width: 90px !important;
+  }
+  #view-section .table-container table th:nth-child(4),
+  #view-section .table-container table tbody tr[data-nik] td:nth-child(4) {
+    left: 166px !important; width: 150px !important; min-width: 150px !important; max-width: 150px !important;
+  }
+
+  /* Toast jangan lebih lebar dari HP */
+  .toast-container {
+    left: 10px !important;
+    right: 10px !important;
+    top: 10px !important;
+  }
+  .toast { min-width: 0 !important; width: 100% !important; max-width: 100% !important; }
+
+  .employee-action-bar { width: 100% !important; }
+  .employee-action-bar .btn-primary { width: 100% !important; }
+}
+
+@media screen and (max-width: 420px) {
+  .topbar-actions .topbar-icon-btn:nth-child(2) { display: none !important; }
+  .topbar { padding: 0 8px !important; }
+  #main-content { padding-left: 8px !important; padding-right: 8px !important; }
+  .dashboard-grid { gap: 7px !important; }
+  .stat-card { padding: 10px !important; }
+  .stat-value { font-size: 24px !important; }
+  .category-card { padding: 10px !important; }
+  .category-card p { font-size: 18px !important; }
+}
+
+@media screen and (max-width: 360px) {
+  .dashboard-grid { grid-template-columns: 1fr 1fr !important; }
+  .stat-trend { display: none !important; }
+  .stat-footer { display: none !important; }
+  .page-title { font-size: 19px !important; }
+  .category-card h4 { font-size: 8.5px !important; }
+}
+
+/* Gunakan tinggi viewport modern ketika address bar HP berubah */
+@supports (height: 100dvh) {
+  #login-page { min-height: 100dvh; }
+  #app { height: 100dvh; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="login-bg-orbs"></div>
+  <div class="login-grid"></div>
+  <div class="login-card">
+    <aside class="login-showcase" aria-hidden="true">
+      <div class="showcase-top"><span class="showcase-mark"><i data-lucide="heart-pulse"></i></span> SIMPEG v2</div>
+      <div class="showcase-copy"><h2>Data kepegawaian, tertata dan terlindungi.</h2><p>Kelola informasi pegawai UPTD Puskesmas Bojongsari dalam satu sistem yang ringkas, aman, dan mudah diakses.</p></div>
+      <div class="showcase-note"><i data-lucide="shield-check"></i> Akses khusus pegawai terverifikasi</div>
+    </aside>
+    <section class="login-form-panel">
+      <div class="login-logo"><i data-lucide="heart-pulse"></i></div>
+      <div class="login-brand"><h1>Selamat datang</h1><div class="subtitle">Masuk untuk melanjutkan ke SIMPEG</div></div>
+      <form onsubmit="event.preventDefault(); login();">
+        <div class="login-input-group"><label>NIK / Username</label><input type="text" id="user" placeholder="Masukkan NIK atau username" autocomplete="username" autofocus><i data-lucide="user"></i></div>
+        <div class="login-input-group"><label>Password</label><input type="password" id="pass" placeholder="Masukkan password" autocomplete="current-password"><i data-lucide="lock"></i><button class="password-toggle" type="button" onclick="togglePassword()" aria-label="Tampilkan password"><i data-lucide="eye"></i></button></div>
+        <button type="submit" class="btn-login"><span>Masuk ke Dashboard</span><i data-lucide="arrow-right" style="width:18px;height:18px;stroke-width:2;"></i></button>
+      </form>
+    <div class="login-footer">
+      © 2026 AYUMI PROJECT
+    </div>
+    </section>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar">AD</div>
+      <div class="sidebar-profile-info">
+        <div class="name">Administrator</div>
+        <div class="role">Online • Admin</div>
+      </div>
+    </div>
+    <div class="sidebar-brand">
+      <div class="brand-title">SIMPEG<span>Puskesmas Bojongsari</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menu Utama</div>
+      <button class="menu-btn active-menu" id="m-dashboard" onclick="showSection('dashboard')">
+        <i data-lucide="layout-dashboard"></i><span class="menu-text">Dashboard</span>
+      </button>
+      <button class="menu-btn" id="m-personal" onclick="showSection('personal')">
+        <i data-lucide="user-search"></i><span class="menu-text">Pencarian Pegawai</span>
+      </button>
+      <button class="menu-btn" id="m-input-data" onclick="showSection('input-data')">
+        <i data-lucide="user-plus"></i><span class="menu-text" id="menu-input-text">Input Pegawai Baru</span>
+      </button>
+
+      <div class="nav-label">Data Pegawai</div>
+      <button class="menu-btn" id="m-view-asn" onclick="showSection('view-asn')">
+        <i data-lucide="award"></i><span class="menu-text">Data ASN</span>
+      </button>
+      <button class="menu-btn" id="m-view-pppk" onclick="showSection('view-pppk')">
+        <i data-lucide="file-check"></i><span class="menu-text">Data PPPK</span>
+      </button>
+      <button class="menu-btn" id="m-view-pjlp" onclick="showSection('view-pjlp')">
+        <i data-lucide="briefcase"></i><span class="menu-text">Data PJLP</span>
+      </button>
+      <button class="menu-btn" id="m-cetak" onclick="tampilPegawaiPuskesmas()">
+        <i data-lucide="users"></i><span class="menu-text">Semua Pegawai</span>
+      </button>
+
+      <div class="nav-label">Klaster</div>
+      <button class="menu-btn" id="m-struktur-organisasi" onclick="showSection('struktur-organisasi')">
+        <i data-lucide="network"></i><span class="menu-text">Struktur Organisasi</span>
+      </button>
+      <button class="menu-btn cluster-menu" id="m-view-klaster1" onclick="showSection('view-klaster1')">
+        <i data-lucide="layers"></i><span class="menu-text">Klaster 1</span>
+      </button>
+      <button class="menu-btn cluster-menu" id="m-view-klaster2" onclick="showSection('view-klaster2')">
+        <i data-lucide="layers"></i><span class="menu-text">Klaster 2</span>
+      </button>
+      <button class="menu-btn cluster-menu" id="m-view-klaster3" onclick="showSection('view-klaster3')">
+        <i data-lucide="layers"></i><span class="menu-text">Klaster 3</span>
+      </button>
+      <button class="menu-btn cluster-menu" id="m-view-klaster4" onclick="showSection('view-klaster4')">
+        <i data-lucide="layers"></i><span class="menu-text">Klaster 4</span>
+      </button>
+      <button class="menu-btn cluster-menu" id="m-view-lintas-klaster" onclick="showSection('view-lintas-klaster')">
+        <i data-lucide="network"></i><span class="menu-text">Lintas Klaster</span>
+      </button>
+      <button class="menu-btn admin-only" id="m-mutasi" onclick="showSection('mutasi')" style="display:none;">
+        <i data-lucide="repeat-2"></i><span class="menu-text">Data Mutasi Pegawai</span>
+      </button>
+      <div class="nav-label">Lainnya</div>
+      <button class="menu-btn" id="m-upload" onclick="showSection('upload')">
+        <i data-lucide="upload-cloud"></i><span class="menu-text">Upload Berkas</span>
+      </button>
+
+      <div class="nav-label admin-only">Manajemen Sistem</div>
+      <button class="menu-btn admin-only" id="m-manage-users" onclick="showSection('manage-users')" style="display:none;">
+  <i data-lucide="users"></i><span class="menu-text">Kelola Akun Karyawan</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="menu-btn btn-logout" onclick="logout()">
+        <i data-lucide="log-out"></i><span class="menu-text">Keluar</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div id="main-wrapper">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="topbar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+        <i data-lucide="menu"></i>
+      </button>
+      <div class="breadcrumb">
+        <span>SIMPEG</span>
+        <span class="separator">/</span>
+        <span class="current" id="breadcrumb-current">Dashboard</span>
+      </div>
+      <div class="topbar-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Cari pegawai, NIP, atau NIK..." id="global-search" onkeyup="handleGlobalSearch(event)">
+      </div>
+      <div class="topbar-actions">
+        <div class="notif-wrapper">
+  <button class="topbar-icon-btn" id="btn-notif-sip" title="Notifikasi SIP" onclick="toggleSipNotifDropdown()">
+    <i data-lucide="bell"></i>
+    <span class="badge" id="notif-badge" style="display:none;"></span>
+  </button>
+  <div id="sip-notif-dropdown" class="notif-dropdown" style="display:none;">
+    <div class="notif-dropdown-header">Notifikasi Masa Berlaku SIP</div>
+    <div id="sip-notif-list" class="notif-dropdown-list">
+      <div class="notif-empty">Memuat...</div>
+    </div>
+  </div>
+</div>
+        <button class="topbar-icon-btn" title="Bantuan">
+          <i data-lucide="help-circle"></i>
+        </button>
+        <div class="topbar-user">
+          <div class="topbar-user-avatar">AD</div>
+          <div class="topbar-user-info">
+            <div class="name">Admin</div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="section active">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Dashboard Utama</h1>
+            <p class="page-subtitle">Ringkasan data kepegawaian UPTD Puskesmas Bojongsari</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn-primary btn-outline" onclick="loadDashboard()">
+              <i data-lucide="refresh-cw" style="width:16px;height:16px;"></i>Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="stat-card indigo">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="users"></i></div>
+              <div class="stat-trend"><i data-lucide="trending-up"></i>Aktif</div>
+            </div>
+            <div class="stat-label">Total Pegawai</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-footer">
+              <i data-lucide="activity" style="width:12px;height:12px;"></i>
+              <span>Seluruh status kepegawaian</span>
+            </div>
+          </div>
+          <div class="stat-card emerald">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="shield-check"></i></div>
+              <div class="stat-trend"><i data-lucide="check-circle"></i>PNS</div>
+            </div>
+            <div class="stat-label">Pegawai ASN</div>
+            <div class="stat-value" id="stat-asn">0</div>
+            <div class="stat-footer">
+              <i data-lucide="award" style="width:12px;height:12px;"></i>
+              <span>Aparatur Sipil Negara</span>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="file-text"></i></div>
+              <div class="stat-trend"><i data-lucide="award"></i>Kontrak</div>
+            </div>
+            <div class="stat-label">Pegawai PPPK</div>
+            <div class="stat-value" id="stat-pppk">0</div>
+            <div class="stat-footer">
+              <i data-lucide="file-check" style="width:12px;height:12px;"></i>
+              <span>Pegawai Pemerintah PK</span>
+            </div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-header">
+              <div class="stat-icon"><i data-lucide="contact-2"></i></div>
+              <div class="stat-trend"><i data-lucide="briefcase"></i>Non-ASN</div>
+            </div>
+            <div class="stat-label">Pegawai PJLP</div>
+            <div class="stat-value" id="stat-pjlp">0</div>
+            <div class="stat-footer">
+              <i data-lucide="user-check" style="width:12px;height:12px;"></i>
+              <span>Penyedia Jasa Layanan</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Kategori Profesi Utama</div>
+        </div>
+        <div class="category-grid">
+          <div class="category-card cat-red"><div class="category-icon"><i data-lucide="stethoscope"></i></div><h4>Dokter</h4><p id="cat-dokter">0</p></div>
+          <div class="category-card cat-blue"><div class="category-icon"><i data-lucide="heart-pulse"></i></div><h4>Perawat</h4><p id="cat-perawat">0</p></div>
+          <div class="category-card cat-purple"><div class="category-icon"><i data-lucide="baby"></i></div><h4>Bidan</h4><p id="cat-bidan">0</p></div>
+          <div class="category-card cat-amber"><div class="category-icon"><i data-lucide="microscope"></i></div><h4>ATLM</h4><p id="cat-atlm">0</p></div>
+          <div class="category-card cat-cyan"><div class="category-icon"><i data-lucide="pill"></i></div><h4>Farmasi</h4><p id="cat-farmasi">0</p></div>
+          <div class="category-card cat-emerald"><div class="category-icon"><i data-lucide="folder-heart"></i></div><h4>Admin/RM</h4><p id="cat-admin">0</p></div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">Kategori Profesi Pendukung</div>
+        </div>
+        <div class="category-grid">
+          <div class="category-card cat-pink"><div class="category-icon"><i data-lucide="wallet"></i></div><h4>Keuangan</h4><p id="cat-keuangan">0</p></div>
+          <div class="category-card cat-indigo"><div class="category-icon"><i data-lucide="clipboard-list"></i></div><h4>Adminkes</h4><p id="cat-adminkes">0</p></div>
+          <div class="category-card cat-orange"><div class="category-icon"><i data-lucide="droplet"></i></div><h4>Kesling</h4><p id="cat-kesling">0</p></div>
+          <div class="category-card cat-teal"><div class="category-icon"><i data-lucide="megaphone"></i></div><h4>Promkes</h4><p id="cat-promkes">0</p></div>
+          <div class="category-card cat-emerald"><div class="category-icon"><i data-lucide="activity"></i></div><h4>Epidemiolog</h4><p id="cat-epidemiolog">0</p></div>
+          <div class="category-card cat-amber"><div class="category-icon"><i data-lucide="apple"></i></div><h4>Gizi</h4><p id="cat-gizi">0</p></div>
+          <div class="category-card cat-red"><div class="category-icon"><i data-lucide="shield"></i></div><h4>Keamanan</h4><p id="cat-keamanan">0</p></div>
+          <div class="category-card cat-cyan"><div class="category-icon"><i data-lucide="sparkles"></i></div><h4>Kebersihan</h4><p id="cat-kebersihan">0</p></div>
+          <div class="category-card cat-purple"><div class="category-icon"><i data-lucide="utensils"></i></div><h4>Juru Masak</h4><p id="cat-jurumasak">0</p></div>
+        </div>
+
+        <div class="dashboard-charts">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Komposisi Kepegawaian</div>
+                <div class="chart-subtitle">Distribusi berdasarkan status</div>
+              </div>
+              <div class="chart-badge">Real-time</div>
+            </div>
+            <canvas id="employeeChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Distribusi Jabatan</div>
+                <div class="chart-subtitle">Statistik profesi utama</div>
+              </div>
+              <div class="chart-badge">Statistik</div>
+            </div>
+            <canvas id="jobChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONAL -->
+      <div id="personal" class="section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Data Personal Pegawai</h1>
+            <p class="page-subtitle" id="personal-subtitle">Data pribadi pegawai tampil sesuai akun login</p>
+          </div>
+        </div>
+        <div class="form-container" style="max-width: 640px;">
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="search-input" placeholder="Masukkan nama atau NIK pegawai..." style="flex: 1;">
+            <button onclick="searchPersonalData()" class="btn-primary" style="padding: 11px 24px;">
+              <i data-lucide="search" style="width:16px;height:16px;"></i>Cari
+            </button>
+          </div>
+        </div>
+        <div id="personal-result" style="display:none;">
+          <div class="profile-card">
+            <div class="profile-avatar-box">
+              <div class="profile-avatar-wrapper">
+                <img class="profile-avatar" src="https://via.placeholder.com/200x240/6366f1/ffffff?text=Foto" alt="Foto">
+                <div class="profile-avatar-overlay">
+                  <div class="name" id="p-nama-overlay">-</div>
+                  <div class="role" id="p-sub-jabatan-overlay">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="profile-details">
+              <h2 class="profile-title" id="p-nama">-</h2>
+              <p class="profile-subtitle" id="p-sub-jabatan">-</p>
+              <div class="form-section-title" style="margin-top: 0;">Biodata Primer</div>
+              <div class="profile-info-grid">
+                <div class="info-item"><span>NIK (KTP)</span><p id="p-nik">-</p></div>
+                <div class="info-item"><span>No. Kartu Keluarga</span><p id="p-kk">-</p></div>
+                <div class="info-item"><span>NIP</span><p id="p-nip">-</p></div>
+                <div class="info-item"><span>Jenis Kelamin</span><p id="p-jk">-</p></div>
+                <div class="info-item"><span>Agama</span><p id="p-agama">-</p></div>
+                <div class="info-item"><span>Status Pernikahan</span><p id="p-kawin">-</p></div>
+                <div class="info-item"><span>Tempat, Tanggal Lahir</span><p id="p-ttl">-</p></div>
+                <div class="info-item"><span>Usia</span><p id="p-usia">-</p></div>
+                <div class="info-item"><span>No HP</span><p id="p-hp">-</p></div>
+                <div class="info-item"><span>Email</span><p id="p-email">-</p></div>
+                <div class="info-item" style="grid-column: 1 / -1;"><span>Alamat KTP</span><p id="p-alamat-ktp">-</p></div>
+                <div class="info-item" style="grid-column: 1 / -1;"><span>Alamat Domisili</span><p id="p-alamat-domisili">-</p></div>
+                <div class="form-section-title">Informasi Klaster</div>
+<div class="profile-info-grid">
+  <div class="info-item">
+    <span>Jenis Klaster</span>
+    <p id="p-klaster">-</p>
+  </div>
+  <div class="info-item">
+    <span>Penanggung Jawab dan Koordinator</span>
+    <p id="p-peran-klaster">-</p>
+  </div>
+</div>
+              </div>
+              <div class="form-section-title">Status Kepegawaian</div>
+              <div class="profile-info-grid">
+                <div class="info-item"><span>Status Pegawai</span><p id="p-status">-</p></div>
+                <div class="info-item"><span>Pangkat</span><p id="p-pangkat">-</p></div>
+                <div class="info-item"><span>Golongan</span><p id="p-golongan">-</p></div>
+                <div class="info-item"><span>TMT Golongan</span><p id="p-tmt-golongan">-</p></div>
+                <div class="info-item"><span>Jabatan</span><p id="p-jabatan">-</p></div>
+                <div class="info-item"><span>TMT Jabatan</span><p id="p-tmt-jabatan">-</p></div>
+                <div class="info-item"><span>TMT CPNS</span><p id="p-tmt-cpns">-</p></div>
+                <div class="info-item"><span>TMT PNS</span><p id="p-tmt-pns">-</p></div>
+                <div class="info-item"><span>TMT Puskesmas</span><p id="p-tmt-puskesmas">-</p></div>
+                <div class="info-item"><span>Masa Kerja ASN</span><p id="p-mk-asn">-</p></div>
+                <div class="info-item"><span>Masa Kerja Puskesmas</span><p id="p-mk-pusk">-</p></div>
+                <div class="info-item"><span>Estimasi Pensiun</span><p id="p-pensiun">-</p></div>
+              </div>
+              <div class="form-section-title">Riwayat Pendidikan</div>
+              <div class="profile-info-grid">
+                <div class="info-item"><span>Pendidikan Terakhir</span><p id="p-pendidikan">-</p></div>
+                <div class="info-item"><span>Jurusan</span><p id="p-jurusan">-</p></div>
+                <div class="info-item"><span>Nama Sekolah/Universitas</span><p id="p-sekolah">-</p></div>
+                <div class="info-item"><span>Tanggal Lulus</span><p id="p-tgl-lulus">-</p></div>
+                <div class="info-item"><span>No. Ijazah</span><p id="p-ijazah">-</p></div>
+              </div>
+              <div class="form-section-title">Legalitas & Jaminan</div>
+              <div class="profile-info-grid">
+                <div class="info-item"><span>BPJS Kesehatan</span><p id="p-bpjs-kes">-</p></div>
+                <div class="info-item"><span>BPJS Ketenagakerjaan</span><p id="p-bpjs-ket">-</p></div>
+                <div class="info-item"><span>NPWP</span><p id="p-npwp">-</p></div>
+                <div class="info-item"><span>No. Karpeg</span><p id="p-karpeg">-</p></div>
+                <div class="info-item"><span>No. Karsu</span><p id="p-karsu">-</p></div>
+                <div class="info-item"><span>No. Rekening</span><p id="p-rek">-</p></div>
+                <div class="info-item"><span>No. STR</span><p id="p-str">-</p></div>
+                <div class="info-item"><span>Tanggal STR</span><p id="p-tgl-str">-</p></div>
+                <div class="info-item"><span>Berlaku STR</span><p id="p-berlaku-str">-</p></div>
+                <div class="info-item"><span>No. SIP</span><p id="p-sip">-</p></div>
+                <div class="info-item"><span>Tanggal SIP</span><p id="p-tgl-sip">-</p></div>
+                <div class="info-item"><span>Berlaku SIP</span><p id="p-berlaku-sip">-</p></div>
+              </div>
+              <div class="form-section-title">Data Keluarga</div>
+              <div class="profile-info-grid">
+                <div class="info-item"><span>Nama Suami/Istri</span><p id="p-pasangan">-</p></div>
+                <div class="info-item"><span>Jumlah Anak</span><p id="p-anak">-</p></div>
+                <div class="info-item"><span>Kontak Darurat Saudara</span><p id="p-kontak-saudara">-</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM INPUT -->
+      <div id="input-data" class="section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="form-title">Form Registrasi Pegawai Baru</h1>
+            <p class="page-subtitle">Lengkapi data pegawai dengan benar dan lengkap</p>
+          </div>
+        </div>
+        <form id="formPegawai" class="form-container">
+          <div class="form-section-title" style="margin-top: 0;">1. Identitas Pribadi</div>
+          <div class="form-grid">
+            <div class="form-group"><label class="required">Nama Lengkap</label><input type="text" name="nama" required></div>
+            <div class="form-group"><label class="required">NIK (No. KTP)</label><input type="text" name="nik" required></div>
+            <div class="form-group">
+              <label class="required">Jenis Klaster</label>
+              <select name="klaster" required>
+                <option value="">Pilih Klaster</option>
+                <option value="Klaster 1">Klaster 1</option>
+                <option value="Klaster 2">Klaster 2</option>
+                <option value="Klaster 3">Klaster 3</option>
+                <option value="Klaster 4">Klaster 4</option>
+                <option value="Lintas Klaster">Lintas Klaster</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="required">Status Peran</label>
+              <select name="peran_klaster" required>
+                <option value="">Pilih Status Peran</option>
+                <option value="Penanggung Jawab">Penanggung Jawab</option>
+                <option value="Koordinator">Koordinator</option>
+                <option value="Anggota">Anggota</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>Jabatan/Peran Klaster</label>
+              <input type="text" name="penanggung_jawab_dan_koordinator" placeholder="Contoh: Koordinator Manajemen Arsip" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label>Foto Pegawai</label>
+              <input type="file" id="foto-pegawai" accept="image/*" onchange="previewEmployeePhoto(event)">
+              <input type="hidden" name="foto_url" id="foto-url">
+              <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+                <img id="foto-preview" src="https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto" alt="Preview Foto" style="width:72px;height:86px;object-fit:cover;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+                <span style="font-size:12px;color:var(--text-muted);line-height:1.5;">Format JPG/PNG. Foto akan tampil pada data personal pegawai.</span>
+              </div>
+            </div>
+            <div class="form-group"><label class="required">Status Pegawai</label>
+              <select name="status_pegawai" required>
+                <option value="ASN">ASN (PNS)</option><option value="PPPK">PPPK</option><option value="PJLP">PJLP (Non ASN)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>No. Kartu Keluarga</label><input type="text" name="no_kk"></div>
+            <div class="form-group"><label>Jenis Kelamin</label>
+              <select name="jk"><option>Laki-laki</option><option>Perempuan</option></select>
+            </div>
+            <div class="form-group"><label>Agama</label>
+              <select name="agama"><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Budha</option><option>Konghucu</option></select>
+            </div>
+            <div class="form-group"><label>Status Perkawinan</label>
+              <select name="status_kawin"><option>Belum Kawin</option><option>Kawin</option><option>Cerai Hidup</option><option>Cerai Mati</option></select>
+            </div>
+            <div class="form-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir"></div>
+            <div class="form-group"><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir"></div>
+            <div class="form-group"><label>No. HP</label><input type="text" name="no_hp"></div>
+            <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+            <div class="form-group full-width"><label>Alamat KTP</label><textarea name="alamat_ktp" rows="2"></textarea></div>
+            <div class="form-group full-width"><label>Alamat Domisili</label><textarea name="alamat_domisili" rows="2"></textarea></div>
+          </div>
+          <div class="form-section-title">2. Status Kepegawaian</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Pangkat</label><input type="text" name="pangkat" placeholder="Penata Tingkat I"></div>
+            <div class="form-group"><label>Golongan</label><input type="text" name="golongan" placeholder="III/b"></div>
+            <div class="form-group"><label>TMT Golongan</label><input type="date" name="tmt_golongan"></div>
+            <div class="form-group"><label>Jabatan</label><input type="text" name="jabatan" placeholder="Perawat Mahir"></div>
+            <div class="form-group"><label>TMT Jabatan</label><input type="date" name="tmt_jabatan"></div>
+            <div class="form-group"><label>NIP</label><input type="text" name="nip" placeholder="Kosongkan jika PJLP"></div>
+            <div class="form-group"><label>TMT CPNS</label><input type="date" name="tmt_cpns"></div>
+            <div class="form-group"><label>TMT PNS</label><input type="date" name="tmt_pns"></div>
+            <div class="form-group"><label>TMT Puskesmas</label><input type="date" name="tmt_puskesmas"></div>
+          </div>
+          <div class="form-section-title">3. Riwayat Pendidikan</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Pendidikan Terakhir</label><input type="text" name="pendidikan" placeholder="D3 / S1"></div>
+            <div class="form-group"><label>Jurusan</label><input type="text" name="jurusan" placeholder="Keperawatan"></div>
+            <div class="form-group"><label>Nama Sekolah/Universitas</label><input type="text" name="sekolah"></div>
+            <!-- Bagian Input Tanggal Lulus -->
+          <div class="form-group">
+           <label>Tanggal Lulus</label>
+           <select id="type_lulus" onchange="toggleLulusInput()">
+            <option value="full">Tanggal, Bulan, Tahun</option>
+            <option value="year">Hanya Tahun</option>
+          </select>
+  
+          <!-- Input Lengkap -->
+          <input type="date" name="tgl_lulus_full" id="tgl_lulus_full" class="form-control mt-2">
+  
+          <!-- Input Tahun Saja -->
+          <input type="number" name="tgl_lulus_year" id="tgl_lulus_year" class="form-control mt-2" 
+                 placeholder="Contoh: 2024" style="display:none;" min="1900" max="2100">
+          <!-- Field tersembunyi yang benar-benar dikirim ke server (kolom "Tanggal Lulus" di sheet) -->
+          <input type="hidden" name="tgl_lulus" id="tgl_lulus">
+          </div>
+
+          <script>
+          function toggleLulusInput() {
+            var type = document.getElementById('type_lulus').value;
+            var fullInput = document.getElementById('tgl_lulus_full');
+            var yearInput = document.getElementById('tgl_lulus_year');
+  
+            if (type === 'full') {
+              fullInput.style.display = 'block';
+              yearInput.style.display = 'none';
+            } else {
+              fullInput.style.display = 'none';
+              yearInput.style.display = 'block';
+            }
+            syncTglLulusHidden();
+           }
+           function syncTglLulusHidden() {
+             var type = document.getElementById('type_lulus').value;
+             var hidden = document.getElementById('tgl_lulus');
+             if (!hidden) return;
+             if (type === 'year') {
+               hidden.value = document.getElementById('tgl_lulus_year').value || '';
+             } else {
+               hidden.value = document.getElementById('tgl_lulus_full').value || '';
+             }
+           }
+           document.addEventListener('DOMContentLoaded', function() {
+             var fullEl = document.getElementById('tgl_lulus_full');
+             var yearEl = document.getElementById('tgl_lulus_year');
+             if (fullEl) fullEl.addEventListener('change', syncTglLulusHidden);
+             if (yearEl) yearEl.addEventListener('change', syncTglLulusHidden);
+           });
+          </script>
+            <div class="form-group"><label>No. Ijazah</label><input type="text" name="no_ijazah"></div>
+          </div>
+          <div class="form-section-title">4. Legalitas & Jaminan</div>
+          <div class="form-grid">
+            <div class="form-group"><label>BPJS Kesehatan</label><input type="text" name="bpjs_kes"></div>
+            <div class="form-group"><label>BPJS Ketenagakerjaan</label><input type="text" name="bpjs_ket"></div>
+            <div class="form-group"><label>NPWP</label><input type="text" name="npwp"></div>
+            <div class="form-group"><label>No. Karpeg</label><input type="text" name="karpeg"></div>
+            <div class="form-group"><label>No. Karsu</label><input type="text" name="karsu"></div>
+            <div class="form-group"><label>No. Rekening</label><input type="text" name="no_rek"></div>
+            <div class="form-group"><label>No. STR</label><input type="text" name="no_str"></div>
+            <div class="form-group"><label>Tanggal STR</label><input type="date" name="tgl_str"></div>
+            <div class="form-group">
+              <label>Berlaku STR</label>
+              <select name="berlaku_str" id="berlaku_str_select" onchange="toggleStrDate()">
+                 <option value="">Pilih Masa Berlaku...</option>
+                 <option value="Seumur Hidup">Seumur Hidup</option>
+                 <option value="custom">Pilih Tanggal</option>
+              </select>
+              <input type="date" name="berlaku_str_date" id="berlaku_str_date" style="display:none; margin-top:5px;">
+            </div>
+            <div class="form-group"><label>No. SIP</label><input type="text" name="no_sip"></div>
+            <div class="form-group"><label>Tanggal SIP</label><input type="date" name="tgl_sip"></div>
+            <div class="form-group"><label>Berlaku SIP</label><input type="date" name="berlaku_sip"></div>
+          </div>
+          <div class="form-section-title">5. Data Keluarga</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Nama Suami/Istri</label><input type="text" name="nama_pasangan"></div>
+            <div class="form-group"><label>Jumlah Anak</label><input type="number" name="jml_anak" value="0"></div>
+            <div class="form-group"><label>No. Kontak Saudara (Darurat)</label><input type="text" name="no_kontak_saudara" placeholder="Contoh: 0812xxxxxxxx (Ibu/Adik)"></div>
+          </div>
+          <button type="button" id="btn-submit-form" onclick="submitData()" class="btn-primary btn-block">
+            <i data-lucide="save" style="width:16px;height:16px;"></i>Simpan Data Pegawai
+          </button>
+          <button type="button" id="btn-cancel-edit" onclick="cancelEditMode()" class="btn-primary btn-danger btn-block" style="display:none;">Batal Edit</button>
+        </form>
+      </div>
+
+      <!-- STRUKTUR ORGANISASI -->
+      <div id="struktur-organisasi" class="section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Struktur Organisasi</h1>
+            <p class="page-subtitle">Struktur Penanggung Jawab, Koordinator, dan Anggota berdasarkan klaster</p>
+          </div>
+        </div>
+        <div id="simpeg-org-page"></div>
+      </div>
+
+      <!-- VIEW TABLE -->
+      <div id="view-section" class="section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="view-title">Data Pegawai</h1>
+            <p class="page-subtitle">Kelola dan lihat data lengkap seluruh pegawai</p>
+          </div>
+        </div>
+        <div class="table-utilities">
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <div class="utility-group">
+              <label>Filter Jabatan:</label>
+              <select id="filter-jabatan" class="utility-select" onchange="applyFilterAndSort()">
+                <option value="ALL">Semua Jabatan</option>
+                <option value="DOKTER">Dokter</option>
+                <option value="PERAWAT">Perawat</option>
+                <option value="BIDAN">Bidan</option>
+                <option value="ATLM">ATLM</option>
+                <option value="FARMASI">Farmasi/Apoteker</option>
+                <option value="ADMINISTRASI">Admin/RM</option>
+              </select>
+            </div>
+            <div class="utility-group">
+              <label>Urutkan:</label>
+              <select id="sort-data" class="utility-select" onchange="applyFilterAndSort()">
+                <option value="MANUAL">Manual (Drag & Drop)</option>
+                <option value="NAMA_ASC">Nama (A-Z)</option>
+                <option value="NAMA_DESC">Nama (Z-A)</option>
+                <option value="USIA_DESC">Usia (Tertua)</option>
+                <option value="USIA_ASC">Usia (Termuda)</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="saveNewOrder()" class="btn-primary btn-success" style="padding: 10px 20px;">
+            <i data-lucide="save" style="width:16px;height:16px;"></i>Simpan Urutan
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">⋮⋮</th>
+                <th>No</th>
+                <th>Aksi</th>
+                <th>Nama</th>
+                <th>NIK</th>
+                <th>Jenis Klaster</th>
+                <th>Status Peran</th>
+                <th>Jabatan/Peran Klaster</th>
+                <th>NIP</th><th>No KK</th><th>JK</th>
+                <th>Agama</th><th>Status Kawin</th><th>Tempat Lahir</th><th>Tgl Lahir</th>
+                <th>Usia</th><th>Status</th><th>Alamat Domisili</th><th>Alamat KTP</th>
+                <th>Pangkat</th><th>Golongan</th><th>TMT Gol</th><th>Jabatan</th><th>TMT Jab</th>
+                <th>TMT CPNS</th><th>TMT PNS</th><th>TMT Puskesmas</th><th>MK ASN</th>
+                <th>MK Puskesmas</th><th>Pendidikan</th><th>Jurusan</th><th>Sekolah</th>
+                <th>Tgl Lulus</th><th>No Ijazah</th><th>No HP</th><th>Email</th>
+                <th>BPJS Kes</th><th>BPJS Ket</th><th>NPWP</th><th>Karpeg</th>
+                <th>Karsu</th><th>No Rek</th><th>No STR</th><th>Tgl STR</th>
+                <th>Berlaku STR</th><th>No SIP</th><th>Tgl SIP</th><th>Berlaku SIP</th>
+                <th>Suami/Istri</th><th>Jml Anak</th><th>Kontak Saudara</th><th>Pensiun</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- MUTASI -->
+<div id="mutasi-section" class="section">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Data Mutasi Pegawai</h1>
+      <p class="page-subtitle">Pegawai yang telah dimutasi keluar dari Puskesmas Bojongsari</p>
+    </div>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th><th>Aksi</th><th>Nama</th><th>NIK</th><th>Jabatan</th>
+          <th>Status</th><th>Tanggal Mutasi</th><th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody id="mutasi-table-body">
+        <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+      <!-- UPLOAD -->
+      <div id="upload" class="section">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Upload Berkas Pegawai</h1>
+            <p class="page-subtitle">Unggah dokumen pegawai ke sistem penyimpanan</p>
+          </div>
+        </div>
+        <div class="form-container" style="max-width: 540px;">
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="required">Nama Pegawai</label>
+            <input type="text" id="upload-name" placeholder="Ketik nama lengkap pegawai...">
+          </div>
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="required">Pilih File Dokumen</label>
+            <input type="file" id="upload-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+          </div>
+          <button onclick="handleFileUpload()" class="btn-primary btn-block">
+            <i data-lucide="upload-cloud" style="width:16px;height:16px;"></i>Mulai Unggah
+          </button>
+          <p id="upload-status" style="margin-top: 20px; font-weight: 500; font-size: 13px; color: var(--primary);"></p>
+        </div>
+      </div>
+      <!-- MANAGE USERS SECTION -->
+<div id="manage-users" class="section">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Kelola Akun Karyawan</h1>
+      <p class="page-subtitle">Buat akun login untuk pegawai agar bisa mengakses sistem</p>
+    </div>
+  </div>
+  
+  <div class="form-container" style="max-width: 600px;">
+    <div class="form-section-title" style="margin-top:0;">Buat Akun Baru</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="required">NIK Pegawai</label>
+        <input type="text" id="new-user-nik" placeholder="Pastikan NIK sudah ada di Data Pegawai">
+      </div>
+      <div class="form-group">
+        <label class="required">Nama Lengkap</label>
+        <input type="text" id="new-user-name" placeholder="Nama sesuai data pegawai">
+      </div>
+      <div class="form-group">
+        <label class="required">Password Login</label>
+        <input type="text" id="new-user-pass" placeholder="Minimal 6 karakter">
+      </div>
+      <div class="form-group">
+        <label>Role Akses</label>
+        <select id="new-user-role">
+          <option value="Pegawai">Pegawai</option>
+          <option value="SuperAdmin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="createNewUser()" class="btn-primary btn-block" style="margin-top:20px;">
+      <i data-lucide="user-plus" style="width:16px;height:16px;"></i>Buat Akun
+    </button>
+  </div>
+
+  <div class="table-utilities" style="margin-top: 24px;">
+    <div class="section-title">Daftar Akun Aktif</div>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>NIK</th>
+          <th>Nama</th>
+          <th>Role</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="user-list-body">
+        <!-- Data akan dimuat via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+    </main>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+window.currentEditNik = null;
+let employeeChartInstance = null;
+let jobChartInstance = null;
+window.currentActiveType = null;
+window.currentFilteredData = [];
+window.globalData = [];
+
+function forceRefreshIcons() {
+  setTimeout(() => { if (typeof lucide !== "undefined") lucide.createIcons(); }, 50);
+}
+
+function animateCounter(element, target) {
+  const duration = 800;
+  const start = parseInt(element.innerText) || 0;
+  const end = parseInt(target) || 0;
+  const startTime = performance.now();
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    element.innerText = Math.floor(start + (end - start) * eased);
+    if (progress < 1) requestAnimationFrame(update);
+    else element.innerText = end;
+  }
+  requestAnimationFrame(update);
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: 'check-circle', error: 'x-circle', warning: 'alert-circle', info: 'info' };
+  const colors = { success: 'var(--success)', error: 'var(--danger)', warning: 'var(--warning)', info: 'var(--primary)' };
+  toast.innerHTML = `
+    <div class="toast-icon">
+      <i data-lucide="${icons[type]}" style="width:20px;height:20px;stroke:${colors[type]};stroke-width:2;"></i>
+    </div>
+    <span class="toast-message">${message}</span>
+    <span class="toast-close" onclick="this.parentElement.remove()">
+      <i data-lucide="x" style="width:16px;height:16px;stroke-width:2;"></i>
+    </span>`;
+  container.appendChild(toast);
+  forceRefreshIcons();
+  setTimeout(() => {
+    toast.style.animation = 'slideInRight 0.3s reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('hidden');
+  forceRefreshIcons();
+}
+
+function updateBreadcrumb(text) {
+  document.getElementById('breadcrumb-current').innerText = text;
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active-menu'));
+  
+  if(id.includes('view-')) {
+    var viewKey = id.replace('view-', '');
+    var clusterMap = {
+      'klaster1': 'Klaster 1',
+      'klaster2': 'Klaster 2',
+      'klaster3': 'Klaster 3',
+      'klaster4': 'Klaster 4',
+      'lintas-klaster': 'Lintas Klaster'
+    };
+    if (clusterMap[viewKey]) {
+      window.currentActiveType = 'KLASTER:' + clusterMap[viewKey];
+      document.getElementById('view-title').innerText = "Data " + clusterMap[viewKey];
+      updateBreadcrumb(clusterMap[viewKey]);
+    } else {
+      window.currentActiveType = viewKey.toUpperCase();
+      document.getElementById('view-title').innerText = "Data Pegawai: " + window.currentActiveType;
+      updateBreadcrumb("Data " + window.currentActiveType);
+    }
+    document.getElementById('view-section').classList.add('active');
+    const targetBtn = document.getElementById('m-' + id);
+    if(targetBtn) targetBtn.classList.add('active-menu');
+    document.getElementById('filter-jabatan').value = "ALL";
+    document.getElementById('sort-data').value = "MANUAL";
+    fetchTableData(window.currentActiveType);
+  } else {
+    document.getElementById(id).classList.add('active');
+    const targetBtn = document.getElementById('m-' + id);
+    if(targetBtn) targetBtn.classList.add('active-menu');
+    
+    const titles = {
+  'dashboard': 'Dashboard',
+  'personal': 'Pencarian Pegawai',
+  'input-data': window.currentEditNik ? 'Edit Pegawai' : 'Input Pegawai Baru',
+  'upload': 'Upload Berkas',
+  'mutasi': 'Data Mutasi Pegawai',
+  'struktur-organisasi': 'Struktur Organisasi'
+};
+    updateBreadcrumb(titles[id] || 'Dashboard');
+
+    // Menu Pencarian Pegawai: Admin langsung melihat daftar kartu pegawai.
+    // Jika data dashboard belum tersedia, loadDashboard() akan mengisinya dan
+    // hydrateDashboard() di bawah akan otomatis merender daftar setelah data masuk.
+    if (id === 'personal' && window.currentUserRole === 'SuperAdmin') {
+      if (window.globalData && window.globalData.length > 0) {
+        renderPersonalList(window.globalData);
+      } else {
+        loadDashboard();
+      }
+    }
+    if (id === 'mutasi') {
+  fetchMutasiData();
+}
+    // -------------------------
+  }
+  forceRefreshIcons();
+}
+
+function initCharts(asn, pppk, pjlp) {
+  const ctx1 = document.getElementById('employeeChart').getContext('2d');
+  if (employeeChartInstance) employeeChartInstance.destroy();
+  employeeChartInstance = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+      labels: ['ASN', 'PPPK', 'PJLP'],
+      datasets: [{ data: [asn, pppk, pjlp], backgroundColor: ['#10b981', '#a855f7', '#f59e0b'], borderWidth: 0, hoverOffset: 15 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20, font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } } }
+      },
+      cutout: '72%'
+    }
+  });
+  const ctx2 = document.getElementById('jobChart').getContext('2d');
+  if (jobChartInstance) jobChartInstance.destroy();
+  const jobData = window.globalData ? calculateJobDistribution() : [0, 0, 0, 0, 0, 0];
+  jobChartInstance = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: ['Dokter', 'Perawat', 'Bidan', 'ATLM', 'Farmasi', 'Admin'],
+      datasets: [{
+        label: 'Jumlah Pegawai', data: jobData,
+        backgroundColor: ['rgba(239,68,68,0.85)', 'rgba(59,130,246,0.85)', 'rgba(168,85,247,0.85)', 'rgba(245,158,11,0.85)', 'rgba(6,182,212,0.85)', 'rgba(16,185,129,0.85)'],
+        borderRadius: 8, borderSkipped: false, maxBarThickness: 48
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } } }
+      }
+    }
+  });
+}
+
+function calculateJobDistribution() {
+  if (!window.globalData) return [0, 0, 0, 0, 0, 0];
+  const stats = { dokter: 0, perawat: 0, bidan: 0, atlm: 0, farmasi: 0, admin: 0 };
+  window.globalData.forEach(emp => {
+    const jab = (emp.jabatan || '').toLowerCase();
+    if (jab.includes('dokter')) stats.dokter++;
+    else if (jab.includes('perawat')) stats.perawat++;
+    else if (jab.includes('bidan')) stats.bidan++;
+    else if (jab.includes('atlm') || jab.includes('laboratorium')) stats.atlm++;
+    else if (jab.includes('farmasi') || jab.includes('apoteker')) stats.farmasi++;
+    else if (jab.includes('admin') || jab.includes('rekam medis')) stats.admin++;
+  });
+  return [stats.dokter, stats.perawat, stats.bidan, stats.atlm, stats.farmasi, stats.admin];
+}
+
+function renderPersonalList(dataList) {
+  const resultDiv = document.getElementById('personal-result');
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '';
+
+  // Jangan bergantung pada helper dari skrip lain. Sebelumnya fungsi ini memanggil
+  // safeText() yang berada di dalam IIFE, sehingga browser menghentikan proses
+  // render dan seluruh kartu pegawai tidak tampil.
+  const text = (value) => value === undefined || value === null || value === '' ? '-' : String(value);
+  const escapeHtml = (value) => text(value).replace(/[&<>"]/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+  })[char]);
+
+  if (!dataList || dataList.length === 0) {
+    resultDiv.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:40px;">Tidak ada data pegawai.</p>';
+    return;
+  }
+
+  const gridContainer = document.createElement('div');
+  gridContainer.style.cssText = "display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px; margin-top: 20px;";
+
+  dataList.forEach(emp => {
+    const card = document.createElement('div');
+    card.className = 'category-card';
+    card.style.cursor = 'pointer';
+    card.style.padding = '20px';
+    card.style.textAlign = 'left';
+    
+    card.innerHTML = `
+      <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+        <div class="category-icon" style="width:50px; height:50px; font-size:20px;">
+          <i data-lucide="user"></i>
+        </div>
+        <div>
+          <h4 style="font-size:16px; margin:0; color:var(--text-primary);">${escapeHtml(emp.nama || emp.nama_pegawai || emp.Nama || emp['Nama Pegawai'])}</h4>
+          <span class="status-badge ${escapeHtml(String(emp.status || '').toLowerCase())}" style="margin-top:4px;">${escapeHtml(emp.status)}</span>
+        </div>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+         <div><b>Jenis Klaster:</b> ${escapeHtml(emp.klaster)}</div>
+<div><b>Status Peran:</b> ${escapeHtml(emp.status_peran || emp.peran_klaster)}</div>
+<div><b>Jabatan/Peran Klaster:</b> ${escapeHtml(emp.jabatan_peran_klaster || emp.penanggung_jawab_dan_koordinator)}</div>
+<div><b>Jabatan:</b> ${escapeHtml(emp.jabatan)}</div>
+<div><b>NIK:</b> ${escapeHtml(emp.nik)}</div>
+<div><b>No. HP:</b> ${escapeHtml(emp.no_hp)}</div>
+      </div>
+      <button type="button" class="btn-primary btn-outline" data-employee-nik="${escapeHtml(emp.nik)}" style="margin-top:15px; width:100%; padding:8px;">
+        Lihat Detail Lengkap
+      </button>
+    `;
+    const detailButton = card.querySelector('[data-employee-nik]');
+    detailButton.addEventListener('click', () => showDetailProfile(String(emp.nik || '')));
+    gridContainer.appendChild(card);
+  });
+
+  resultDiv.appendChild(gridContainer);
+  forceRefreshIcons();
+}
+
+function handleFileUpload() {
+  const fileInput = document.getElementById('upload-file');
+  const empName = document.getElementById('upload-name').value.trim();
+  const statusText = document.getElementById('upload-status');
+  if (fileInput.files.length === 0 || !empName) {
+    showToast("Mohon isi nama pegawai dan pilih file", 'warning'); return;
+  }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  statusText.innerHTML = '<div class="spinner"></div> <span style="margin-left:8px;">Sedang memproses upload...</span>';
+  reader.onload = function(e) {
+    const base64Data = e.target.result;
+    if (typeof google === "undefined" || !google.script) {
+      statusText.innerText = "⚠️ Gagal terhubung ke server";
+      showToast("Gagal terhubung ke server", 'error'); return;
+    }
+    google.script.run.withSuccessHandler(function(res) {
+      if(res.status === "success") {
+        statusText.innerHTML = `✅ ${res.message}. <a href='${res.url}' target='_blank' style='color: var(--primary); font-weight: 700; text-decoration: underline;'>Lihat File</a>`;
+        fileInput.value = ""; showToast("File berhasil diupload", 'success');
+      } else {
+        statusText.innerText = "❌ " + res.message;
+        showToast("Gagal upload: " + res.message, 'error');
+      }
+    }).uploadFileToDrive(empName, file.name, base64Data);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleGlobalSearch(event) {
+  if (event.key === 'Enter') {
+    const q = document.getElementById('global-search').value.trim();
+    if (!q) return;
+    showSection('personal');
+    document.getElementById('search-input').value = q;
+    searchPersonalData();
+  }
+}
+
+function initDragAndDrop() {
+  const tbody = document.getElementById('table-body');
+  const rows = tbody.querySelectorAll('tr');
+  let dragSrcRow = null;
+  rows.forEach(row => {
+    row.addEventListener('dragstart', function(e) {
+      dragSrcRow = this; this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault(); this.classList.add('drag-over'); return false;
+    });
+    row.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+    row.addEventListener('drop', function(e) {
+      e.stopPropagation(); this.classList.remove('drag-over');
+      if (dragSrcRow !== this) {
+        const rect = this.getBoundingClientRect();
+        const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+        tbody.insertBefore(dragSrcRow, next ? this.nextSibling : this);
+        updateRowNumbers();
+        document.getElementById('sort-data').value = "MANUAL";
+      }
+      return false;
+    });
+    row.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+      rows.forEach(r => r.classList.remove('drag-over'));
+    });
+  });
+}
+
+function updateRowNumbers() {
+  const rows = document.querySelectorAll('#table-body tr');
+  rows.forEach((row, index) => {
+    const noCell = row.querySelector('.row-no');
+    if(noCell) noCell.innerText = index + 1;
+  });
+}
+
+function saveNewOrder() {
+  if (window.currentUserRole !== "SuperAdmin") { showToast("Hanya Admin yang dapat menyimpan urutan pegawai", 'warning'); return; }
+  const rows = document.querySelectorAll('#table-body tr');
+  const newOrderNiks = [];
+  rows.forEach(row => {
+    const nik = row.getAttribute('data-nik');
+    if (nik) newOrderNiks.push(nik);
+  });
+  if (newOrderNiks.length === 0) {
+    showToast("Tidak ada data urutan yang bisa disimpan", 'warning'); return;
+  }
+  if (typeof google !== "undefined" && google.script) {
+    google.script.run.withSuccessHandler(function(res) {
+      showToast(res.status === "success" ? "✅ Urutan struktur pegawai berhasil disimpan!" : res.message, res.status === "success" ? 'success' : 'error');
+      loadDashboard();
+    }).withFailureHandler(function(err) {
+      showToast("❌ Gagal menyimpan urutan: " + err.message, 'error');
+    }).saveEmployeeSortOrder(newOrderNiks, window.currentUserRole);
+  } else {
+    showToast("Simulasi lokal: Urutan baru berhasil diproses", 'info');
+  }
+}
+
+function createNewUser() {
+  const nik = document.getElementById('new-user-nik').value;
+  const nama = document.getElementById('new-user-name').value;
+  const pass = document.getElementById('new-user-pass').value;
+  const role = document.getElementById('new-user-role').value;
+
+  if(!nik || !nama || !pass) {
+    showToast("Semua field wajib diisi!", 'warning');
+    return;
+  }
+
+  google.script.run.withSuccessHandler(res => {
+    if(res.status === 'success') {
+      showToast(res.message, 'success');
+      document.getElementById('new-user-nik').value = '';
+      document.getElementById('new-user-name').value = '';
+      document.getElementById('new-user-pass').value = '';
+      loadUserList();
+    } else {
+      showToast(res.message, 'error');
+    }
+  }).createUserAccount({nik: nik, nama: nama, password: pass, role: role});
+}
+
+function loadUserList() {
+  google.script.run.withSuccessHandler(users => {
+    const tbody = document.getElementById('user-list-body');
+    tbody.innerHTML = '';
+    users.forEach(u => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${u.nik}</td>
+          <td>${u.nama}</td>
+          <td><span class="status-badge asn">${u.role}</span></td>
+          <td>
+            <span class="action-icon delete" onclick="alert('Fitur hapus akun belum diaktifkan')">❌</span>
+          </td>
+        </tr>
+      `;
+    });
+  }).getUserList();
+}
+
+function toggleStrDate() {
+  var select = document.getElementById('berlaku_str_select');
+  var dateInput = document.getElementById('berlaku_str_date');
+  if (select.value === 'custom') {
+    dateInput.style.display = 'block';
+  } else {
+    dateInput.style.display = 'none';
+    dateInput.value = '';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); });
+</script>
+
+<script>
+(function() {
+  var profileTemplate = "";
+  var baseShowSection = window.showSection; // simpan referensi showSection asli (dari script pertama) sebelum ditimpa di bawah
+  function isAdmin() { return window.currentUserRole === "SuperAdmin"; }
+  function safeText(value) { return value === undefined || value === null || value === "" ? "-" : value; }
+  function escapeAttr(value) { return String(value || "").replace(/&/g, "&amp;").replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function cacheProfileTemplate() {
+    var resultDiv = document.getElementById("personal-result");
+    if (!profileTemplate && resultDiv) profileTemplate = resultDiv.innerHTML;
+  }
+  function employeeName(match) {
+    if (!match) return '-';
+    return safeText(match.nama || match.nama_pegawai || match.Nama || match['Nama Pegawai']);
+  }
+  function setText(id, value) { var el = document.getElementById(id); if (el) el.innerText = safeText(value); }
+  function defaultPhoto() { return "https://via.placeholder.com/200x240/6366f1/ffffff?text=Foto"; }
+  function normalizePhotoUrl(urlOrId) {
+    var value = String(urlOrId || "").trim();
+    if (!value) return "";
+    var match = value.match(/[-\w]{25,}/);
+    if (match && value.indexOf("drive.google.com/thumbnail") === -1) {
+      return "https://drive.google.com/thumbnail?id=" + match[0] + "&sz=w600";
+    }
+    return value;
+  }
+  function setProfilePhoto(url) {
+    var photoUrl = normalizePhotoUrl(url);
+    document.querySelectorAll('.profile-avatar').forEach(function(img) {
+      img.src = photoUrl || defaultPhoto();
+      img.onerror = function() { this.src = defaultPhoto(); };
+    });
+  }
+  window.previewEmployeePhoto = function(event) {
+    var file = event && event.target && event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var preview = document.getElementById('foto-preview');
+      if (preview) preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  function uploadSelectedPhoto(formDataObj, callback) {
+    var input = document.getElementById('foto-pegawai');
+    var file = input && input.files ? input.files[0] : null;
+    if (!file) { callback(formDataObj); return; }
+    if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2 MB', 'warning'); return; }
+    var nik = formDataObj.nik || window.currentEditNik || window.currentUserNik || 'pegawai';
+    showToast('Mengupload foto pegawai...', 'info');
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.status === 'success') {
+          formDataObj.foto_url = res.url;
+          var hidden = document.getElementById('foto-url');
+          if (hidden) hidden.value = res.url;
+          callback(formDataObj);
+        } else {
+          showToast(res.message || 'Upload foto gagal', 'error');
+        }
+      }).uploadEmployeePhoto(nik, file.name, e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  function fillProfileFields(match) {
+    var namaPegawai = employeeName(match);
+    setProfilePhoto(match.foto_url); setText('p-nama', namaPegawai); setText('p-nama-overlay', namaPegawai); setText('p-sub-jabatan', (match.status || '-') + ' - ' + (match.jabatan || '-')); setText('p-sub-jabatan-overlay', match.jabatan);
+    setText('p-nik', match.nik); setText('p-kk', match.no_kk); setText('p-nip', match.nip); setText('p-jk', match.jk); setText('p-agama', match.agama); setText('p-kawin', match.status_kawin);
+    setText('p-ttl', (match.tempat_lahir || '-') + ', ' + (match.tanggal_lahir || '-')); setText('p-usia', match.usia); setText('p-hp', match.no_hp); setText('p-email', match.email); setText('p-alamat-ktp', match.alamat_ktp); setText('p-alamat-domisili', match.alamat_domisili);
+    setText('p-klaster', match.klaster);
+    setText('p-peran-klaster', match.peran_klaster);
+    setText('p-status', match.status); setText('p-pangkat', match.pangkat); setText('p-golongan', match.golongan); setText('p-tmt-golongan', match.tmt_golongan); setText('p-jabatan', match.jabatan); setText('p-tmt-jabatan', match.tmt_jabatan); setText('p-tmt-cpns', match.tmt_cpns); setText('p-tmt-pns', match.tmt_pns); setText('p-tmt-puskesmas', match.tmt_puskesmas); setText('p-mk-asn', match.mkASN); setText('p-mk-pusk', match.mkPusk); setText('p-pensiun', match.pensiun);
+    setText('p-pendidikan', match.pendidikan); setText('p-jurusan', match.jurusan); setText('p-sekolah', match.sekolah); setText('p-tgl-lulus', match.tgl_lulus); setText('p-ijazah', match.no_ijazah);
+    setText('p-bpjs-kes', match.bpjs_kes); setText('p-bpjs-ket', match.bpjs_ket); setText('p-npwp', match.npwp); setText('p-karpeg', match.karpeg); setText('p-karsu', match.karsu); setText('p-rek', match.no_rek); setText('p-str', match.no_str); setText('p-tgl-str', match.tgl_str); setText('p-berlaku-str', match.berlaku_str); setText('p-sip', match.no_sip); setText('p-tgl-sip', match.tgl_sip); setText('p-berlaku-sip', match.berlaku_sip);
+    setText('p-pasangan', match.nama_pasangan); setText('p-anak', match.jml_anak || '0'); setText('p-kontak-saudara', match.no_kontak_saudara);
+  }
+  // Kartu profil (Data Pribadi) HANYA menampilkan tombol Edit jika akun yang login adalah Admin.
+  // Pegawai biasa hanya bisa MELIHAT datanya sendiri (view-only), sesuai kebijakan akses.
+  function renderProfile(match, withBackButton) {
+    cacheProfileTemplate(); var resultDiv = document.getElementById("personal-result"); if (!resultDiv) return; resultDiv.style.display = "block";
+    var actions = '<div class="employee-action-bar">';
+    if (withBackButton && isAdmin()) actions += '<button class="btn-primary btn-outline" onclick="document.getElementById(\'search-input\').value=\'\'; renderPersonalList(window.globalData);"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i>Kembali</button>';
+    if (isAdmin()) actions += '<button class="btn-primary" onclick="editPegawai(\'' + escapeAttr(match.nik) + '\')"><i data-lucide="edit-3" style="width:16px;height:16px;"></i>Edit Data Pegawai</button>';
+    actions += '</div>';
+    resultDiv.innerHTML = actions + profileTemplate;
+    fillProfileFields(match);
+    forceRefreshIcons();
+  }
+  function hydrateDashboard(res) {
+    res = res || { stats: {}, employees: [] }; var asnNum = parseInt(res.stats.asn || 0), pppkNum = parseInt(res.stats.pppk || 0), pjlpNum = parseInt(res.stats.pjlp || 0);
+    animateCounter(document.getElementById('stat-total'), asnNum + pppkNum + pjlpNum); animateCounter(document.getElementById('stat-asn'), asnNum); animateCounter(document.getElementById('stat-pppk'), pppkNum); animateCounter(document.getElementById('stat-pjlp'), pjlpNum);
+    ['dokter','perawat','bidan','atlm','keuangan','adminkes','kesling','promkes','epidemiolog','gizi','keamanan','kebersihan','jurumasak'].forEach(function(k) { var el = document.getElementById('cat-' + k); if (el) el.innerText = res.stats[k] || 0; });
+    document.getElementById('cat-farmasi').innerText = (res.stats.farmasi || 0) + (res.stats.apoteker || 0); document.getElementById('cat-admin').innerText = (res.stats.administrasi || 0) + (res.stats.rekam_medis || 0);
+    window.globalData = res.employees || [];
+    initCharts(asnNum, pppkNum, pjlpNum); updateSipNotifications(); forceRefreshIcons();
+    // Bila menu Pencarian Pegawai sedang aktif, tampilkan kembali daftar kartu
+    // setelah data selesai dimuat. Tidak mengubah data/database.
+    if (isAdmin() && document.getElementById('personal') && document.getElementById('personal').classList.contains('active')) {
+      renderPersonalList(window.globalData);
+    }
+  }
+  function configureUserChrome() {
+    var name = window.currentUserDisplayName || (isAdmin() ? "Administrator" : "Pegawai"), roleLabel = isAdmin() ? "Admin" : "Pegawai";
+    var initials = name.split(/\s+/).map(function(part) { return part.charAt(0); }).join('').substring(0, 2).toUpperCase() || "PG";
+    document.body.classList.toggle("employee-mode", !isAdmin()); document.querySelectorAll('.sidebar-avatar,.topbar-user-avatar').forEach(function(el) { el.innerText = initials; });
+    var sidebarName = document.querySelector('.sidebar-profile-info .name'), sidebarRole = document.querySelector('.sidebar-profile-info .role'), topName = document.querySelector('.topbar-user-info .name'), topRole = document.querySelector('.topbar-user-info .role');
+    if (sidebarName) sidebarName.innerText = name; if (sidebarRole) sidebarRole.innerText = "Online - " + roleLabel; if (topName) topName.innerText = name; if (topRole) topRole.innerText = roleLabel;
+    var personalSubtitle = document.getElementById('personal-subtitle'); if (personalSubtitle) personalSubtitle.innerText = isAdmin() ? "Cari data lengkap pegawai berdasarkan nama atau NIK" : "Data pribadi Anda (hanya lihat)";
+    var globalSearch = document.getElementById('global-search'); if (globalSearch && !isAdmin()) globalSearch.placeholder = "Data dibatasi untuk akun Anda";
+  }
+  // Menu untuk Pegawai biasa: Dashboard, Pencarian Pegawai (data sendiri, view-only),
+  // dan Semua Pegawai (lihat seluruh pegawai, view-only). Menu "Input Pegawai Baru"
+  // (edit) TIDAK ditampilkan untuk Pegawai -- edit hanya untuk Admin.
+  window.setupMenuByRole = function(role) {
+    window.currentUserRole = role === "SuperAdmin" ? "SuperAdmin" : "Pegawai"; configureUserChrome(); var allowed = isAdmin() ? null : ['m-dashboard', 'm-personal', 'm-cetak', 'm-struktur-organisasi', 'm-view-klaster1', 'm-view-klaster2', 'm-view-klaster3', 'm-view-klaster4', 'm-view-lintas-klaster'];
+    document.querySelectorAll('.sidebar-nav .menu-btn').forEach(function(el) { el.style.display = (!allowed || allowed.indexOf(el.id) >= 0) ? 'flex' : 'none'; });
+    document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = isAdmin() ? '' : 'none'; }); forceRefreshIcons();
+  };
+  window.togglePassword = function() {
+    var input = document.getElementById('pass');
+    var button = document.querySelector('.password-toggle');
+    if (!input || !button) return;
+    var visible = input.type === 'text';
+    input.type = visible ? 'password' : 'text';
+    button.setAttribute('aria-label', visible ? 'Tampilkan password' : 'Sembunyikan password');
+    button.innerHTML = '<i data-lucide="' + (visible ? 'eye' : 'eye-off') + '"></i>';
+    forceRefreshIcons();
+  };
+  window.login = function() {
+    var user = document.getElementById('user').value.trim(), pass = document.getElementById('pass').value.trim(); if (!user || !pass) { showToast("NIK dan Password wajib diisi!", 'warning'); return; }
+    if (typeof google === "undefined" || !google.script) { window.currentUserRole = "SuperAdmin"; window.currentUserNik = user; window.currentUserDisplayName = "Demo Admin"; document.getElementById('login-page').style.display = 'none'; document.getElementById('app').classList.add('active'); setupMenuByRole("SuperAdmin"); initCharts(10, 5, 3); showToast("Mode demo aktif", 'info'); return; }
+    google.script.run
+  .withSuccessHandler(function(res) {
+    console.log("LOGIN RESPONSE:", res);
+    if (res.status === "success") { window.currentUserRole = res.role; window.currentUserNik = res.nik; window.currentUserDisplayName = res.nama || res.nik; document.getElementById('login-page').style.display = 'none'; document.getElementById('app').classList.add('active'); setupMenuByRole(res.role); loadDashboard(); if (res.role !== "SuperAdmin") { showSection('personal'); setTimeout(showOwnProfile, 150); } else showSection('dashboard'); showToast("Selamat datang, " + (res.nama || res.nik), 'success'); } else showToast(res.message, 'error');
+  })
+  .withFailureHandler(function(err) {
+    console.log("LOGIN ERROR:", err.message, err);
+    showToast("Error server: " + err.message, 'error');
+  })
+  .checkLogin(user, pass);
+};
+  // Dashboard selalu memuat data SELURUH pegawai (baik Admin maupun Pegawai),
+  // karena statistik total pegawai wajib sama untuk semua akun.
+  window.loadDashboard = function() {
+  console.log("loadDashboard() DIPANGGIL");
+  if (typeof google === "undefined" || !google.script) { forceRefreshIcons(); return; }
+  google.script.run
+    .withSuccessHandler(function(res) {
+      console.log("DASHBOARD RESPONSE (raw):", res);
+      var parsed = JSON.parse(res);
+      hydrateDashboard(parsed);
+    })
+    .withFailureHandler(function(err) {
+      console.log("DASHBOARD ERROR:", err.message, err);
+    })
+    .getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || "");
+};
+  window.showOwnProfile = function() {
+    var match = (window.globalData || []).find(function(e) { return String(e.nik) === String(window.currentUserNik); }) || (window.globalData || [])[0];
+    if (match) renderProfile(match, false);
+  };
+
+  // Klik "Lihat Detail Lengkap" dari kartu pegawai.
+  // Nilai pencarian tetap berupa NIK agar konteks pegawai yang dipilih terjaga,
+  // sedangkan nama pegawai ditampilkan di kartu Data Personal melalui fillProfileFields().
+  window.showDetailProfile = function(nik) {
+    var match = (window.globalData || []).find(function(e) { return String(e.nik) === String(nik); });
+    if (!match) return;
+    var search = document.getElementById('search-input');
+    if (search) search.value = match.nama || match.nik || '';
+    renderProfile(match, true);
+  };
+
+  // Pegawai biasa hanya bisa melihat profilnya sendiri lewat menu Pencarian Pegawai.
+  // Admin: menu tetap berupa daftar kartu, lalu pencarian hanya menyaring kartu.
+  // Database/server tidak disentuh oleh fungsi ini.
+  window.searchPersonalData = function() {
+    if (!isAdmin()) {
+      showOwnProfile();
+      return;
+    }
+
+    var search = document.getElementById('search-input');
+    var query = search ? search.value.trim().toLowerCase() : '';
+    var allData = window.globalData || [];
+
+    if (!query) {
+      renderPersonalList(allData);
+      return;
+    }
+
+    var filtered = allData.filter(function(e) {
+      var nama = String(e.nama || '').toLowerCase();
+      var nik = String(e.nik || '').toLowerCase();
+      return nama.indexOf(query) >= 0 || nik.indexOf(query) >= 0;
+    });
+
+    if (!filtered.length) {
+      var resultDiv = document.getElementById('personal-result');
+      if (resultDiv) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:40px;">Pegawai tidak ditemukan.</p>';
+      }
+      return;
+    }
+
+    renderPersonalList(filtered);
+  };
+  window.fetchTableData = function(filter) { var tbody = document.getElementById('table-body'); tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;'><div class='spinner'></div><p style='margin-top:16px;color:var(--text-muted);font-size:13px;'>Memuat data...</p></td></tr>"; if (typeof google === "undefined" || !google.script) { applyFilterAndSort(); return; } var runner = google.script.run.withSuccessHandler(function(res) { var parsed = JSON.parse(res); window.globalData = parsed.employees || []; applyFilterAndSort(); updateSipNotifications(); }); if (filter === "SELURUH" || window.currentActiveType === "SELURUH") runner.getAllPegawaiData(); else runner.getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || ""); };
+  window.applyFilterAndSort = function() {
+    if(!window.globalData) return;
+    var data = [];
+    if (window.currentActiveType && window.currentActiveType !== "SELURUH") {
+      if (window.currentActiveType.indexOf("KLASTER:") === 0) {
+        var clusterName = window.currentActiveType.substring(8);
+        data = window.globalData.filter(function(e) {
+          return String(e.klaster || "").trim().toUpperCase() === clusterName.toUpperCase();
+        });
+      } else {
+        data = window.globalData.filter(function(e) { return e.status === window.currentActiveType; });
+      }
+    } else { data = window.globalData.slice(); }
+    var filterJabatan = document.getElementById('filter-jabatan').value;
+    if (filterJabatan !== "ALL") {
+      data = data.filter(function(e) {
+        var jab = (e.jabatan || '').toUpperCase();
+        if (filterJabatan === "FARMASI") return jab.indexOf("FARMASI") >= 0 || jab.indexOf("APOTEKER") >= 0;
+        if (filterJabatan === "ADMINISTRASI") return jab.indexOf("ADMIN") >= 0 || jab.indexOf("REKAM MEDIS") >= 0 || jab.indexOf("RM") >= 0;
+        return jab.indexOf(filterJabatan) >= 0;
+      });
+    }
+    var sortValue = document.getElementById('sort-data').value;
+    if (sortValue === "NAMA_ASC") data.sort(function(a, b) { return (a.nama || '').localeCompare(b.nama || ''); });
+    else if (sortValue === "NAMA_DESC") data.sort(function(a, b) { return (b.nama || '').localeCompare(a.nama || ''); });
+    else if (sortValue === "USIA_ASC") data.sort(function(a, b) { return parseInt(a.usia || 0) - parseInt(b.usia || 0); });
+    else if (sortValue === "USIA_DESC") data.sort(function(a, b) { return parseInt(b.usia || 0) - parseInt(a.usia || 0); });
+    window.currentFilteredData = data;
+    renderTableRows(data);
+  };
+  // Baris tabel "Semua Pegawai": tombol Edit & Hapus, serta drag-and-drop pengurutan
+  // HANYA muncul untuk Admin. Pegawai biasa melihat tabel dalam mode read-only murni.
+  window.renderTableRows = function(items) {
+    var tbody = document.getElementById('table-body'); items = items || []; if (items.length === 0) { tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;color:var(--text-muted);'>Tidak ada data pegawai</td></tr>"; return; }
+    tbody.innerHTML = items.map(function(e, i) { var statusClass = (e.status || '').toLowerCase(); var actions = ''; if (isAdmin()) { actions += '<button type="button" class="action-icon" onclick="editPegawai(\'' + escapeAttr(e.nik) + '\')" title="Edit data pegawai" aria-label="Edit data pegawai"><i data-lucide="pencil-line"></i></button>'; actions += '<button type="button" class="action-icon mutasi" onclick="promptMutasi(\'' + escapeAttr(e.nik) + '\', \'' + escapeAttr(e.nama) + '\')" title="Mutasi pegawai" aria-label="Mutasi pegawai"><i data-lucide="repeat-2"></i></button>'; actions += '<button type="button" class="action-icon delete" onclick="hapusPegawai(\'' + escapeAttr(e.nik) + '\', \'' + escapeAttr(e.nama) + '\')" title="Hapus data pegawai" aria-label="Hapus data pegawai"><i data-lucide="trash-2"></i></button>'; } else { actions = '<span style="color:var(--text-muted);font-size:11px;">Lihat saja</span>'; }
+      return '<tr ' + (isAdmin() ? 'draggable="true"' : '') + ' data-nik="' + escapeAttr(e.nik) + '"><td class="drag-handle">' + (isAdmin() ? '::' : '') + '</td><td class="row-no">' + (i + 1) + '</td><td>' + actions + '</td><td><b>' + safeText(e.nama) + '</b></td><td>' + safeText(e.nik) + '</td><td><span class="cluster-badge">' + safeText(e.klaster || '-') + '</span></td><td><span class="cluster-role-badge">' + safeText(e.status_peran || e.peran_klaster || '-') + '</span></td><td>' + safeText(e.jabatan_peran_klaster || e.penanggung_jawab_dan_koordinator || '-') + '</td><td>' + safeText(e.nip) + '</td><td>' + safeText(e.no_kk) + '</td><td>' + safeText(e.jk) + '</td><td>' + safeText(e.agama) + '</td><td>' + safeText(e.status_kawin) + '</td><td>' + safeText(e.tempat_lahir) + '</td><td>' + safeText(e.tanggal_lahir) + '</td><td><b>' + safeText(e.usia) + '</b></td><td><span class="status-badge ' + statusClass + '">' + safeText(e.status) + '</span></td><td>' + safeText(e.alamat_domisili) + '</td><td>' + safeText(e.alamat_ktp) + '</td><td>' + safeText(e.pangkat) + '</td><td>' + safeText(e.golongan) + '</td><td>' + safeText(e.tmt_golongan) + '</td><td>' + safeText(e.jabatan) + '</td><td>' + safeText(e.tmt_jabatan) + '</td><td>' + safeText(e.tmt_cpns) + '</td><td>' + safeText(e.tmt_pns) + '</td><td>' + safeText(e.tmt_puskesmas) + '</td><td><b>' + safeText(e.mkASN) + '</b></td><td><b>' + safeText(e.mkPusk) + '</b></td><td>' + safeText(e.pendidikan) + '</td><td>' + safeText(e.jurusan) + '</td><td>' + safeText(e.sekolah) + '</td><td>' + safeText(e.tgl_lulus) + '</td><td>' + safeText(e.no_ijazah) + '</td><td>' + safeText(e.no_hp) + '</td><td>' + safeText(e.email) + '</td><td>' + safeText(e.bpjs_kes) + '</td><td>' + safeText(e.bpjs_ket) + '</td><td>' + safeText(e.npwp) + '</td><td>' + safeText(e.karpeg) + '</td><td>' + safeText(e.karsu) + '</td><td>' + safeText(e.no_rek) + '</td><td>' + safeText(e.no_str) + '</td><td>' + safeText(e.tgl_str) + '</td><td>' + safeText(e.berlaku_str) + '</td><td>' + safeText(e.no_sip) + '</td><td>' + safeText(e.tgl_sip) + '</td><td>' + safeText(e.berlaku_sip) + '</td><td>' + safeText(e.nama_pasangan) + '</td><td>' + safeText(e.jml_anak) + '</td><td>' + safeText(e.no_kontak_saudara) + '</td><td><b>' + safeText(e.pensiun) + '</b></td></tr>';
+    }).join(''); if (isAdmin()) initDragAndDrop(); forceRefreshIcons();
+  };
+  // editPegawai kini KHUSUS ADMIN. Pegawai biasa (termasuk untuk data dirinya sendiri)
+  // tidak diberi akses edit sama sekali -- sesuai kebijakan: hanya Admin yang bisa edit.
+  window.editPegawai = function(nik) {
+    if (!isAdmin()) { showToast('Fitur edit hanya tersedia untuk Admin', 'warning'); return; }
+    var target = (window.globalData || []).find(function(e) { return String(e.nik) === String(nik); }); if (!target) return; window.currentEditNik = String(nik);
+    document.getElementById('form-title').innerText = "Edit Data: " + target.nama; document.getElementById('menu-input-text').innerText = "Edit Pegawai"; document.getElementById('btn-submit-form').innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i>Update Data'; document.getElementById('btn-cancel-edit').style.display = "block";
+    var form = document.getElementById('formPegawai'); form.nama.value = target.nama || ''; form.nik.value = target.nik || ''; form.nik.readOnly = false; if (form.klaster) form.klaster.value = target.klaster || ''; if (form.peran_klaster) form.peran_klaster.value = target.status_peran || target.peran_klaster || ''; if (form.penanggung_jawab_dan_koordinator) form.penanggung_jawab_dan_koordinator.value = target.jabatan_peran_klaster || target.penanggung_jawab_dan_koordinator || ''; if (form.foto_url) form.foto_url.value = normalizePhotoUrl(target.foto_url) || ''; var fotoPreview = document.getElementById('foto-preview'); if (fotoPreview) fotoPreview.src = normalizePhotoUrl(target.foto_url) || defaultPhoto(); var fotoInput = document.getElementById('foto-pegawai'); if (fotoInput) fotoInput.value = ''; form.status_pegawai.value = target.status || 'ASN'; form.no_kk.value = target.no_kk || ''; form.jk.value = target.jk || 'Laki-laki'; form.agama.value = target.agama || 'Islam'; form.status_kawin.value = target.status_kawin || 'Belum Kawin'; form.tempat_lahir.value = target.tempat_lahir || ''; form.tanggal_lahir.value = target.tanggal_lahir ? formatDateForInput(target.tanggal_lahir) : ''; form.no_hp.value = target.no_hp || ''; form.email.value = target.email || ''; form.alamat_ktp.value = target.alamat_ktp || ''; form.alamat_domisili.value = target.alamat_domisili || ''; form.pangkat.value = target.pangkat || ''; form.golongan.value = target.golongan || ''; form.tmt_golongan.value = target.tmt_golongan ? formatDateForInput(target.tmt_golongan) : ''; form.jabatan.value = target.jabatan || ''; form.tmt_jabatan.value = target.tmt_jabatan ? formatDateForInput(target.tmt_jabatan) : ''; form.nip.value = target.nip || ''; form.tmt_cpns.value = target.tmt_cpns ? formatDateForInput(target.tmt_cpns) : ''; form.tmt_pns.value = target.tmt_pns ? formatDateForInput(target.tmt_pns) : ''; form.tmt_puskesmas.value = target.tmt_puskesmas ? formatDateForInput(target.tmt_puskesmas) : ''; form.pendidikan.value = target.pendidikan || ''; form.jurusan.value = target.jurusan || ''; form.sekolah.value = target.sekolah || ''; if (document.getElementById('tgl_lulus_full')) { document.getElementById('tgl_lulus_full').value = target.tgl_lulus ? formatDateForInput(target.tgl_lulus) : ''; document.getElementById('tgl_lulus_year').value = ''; document.getElementById('type_lulus').value = 'full'; if (typeof toggleLulusInput === 'function') toggleLulusInput(); } form.no_ijazah.value = target.no_ijazah || ''; form.bpjs_kes.value = target.bpjs_kes || ''; form.bpjs_ket.value = target.bpjs_ket || ''; form.npwp.value = target.npwp || ''; form.karpeg.value = target.karpeg || ''; form.karsu.value = target.karsu || ''; form.no_rek.value = target.no_rek || ''; form.no_str.value = target.no_str || ''; form.tgl_str.value = target.tgl_str ? formatDateForInput(target.tgl_str) : ''; if (target.berlaku_str === 'Seumur Hidup') { document.getElementById('berlaku_str_select').value = 'Seumur Hidup'; document.getElementById('berlaku_str_date').style.display = 'none'; document.getElementById('berlaku_str_date').value = ''; } else { document.getElementById('berlaku_str_select').value = target.berlaku_str ? 'custom' : ''; document.getElementById('berlaku_str_date').style.display = target.berlaku_str ? 'block' : 'none'; document.getElementById('berlaku_str_date').value = target.berlaku_str ? formatDateForInput(target.berlaku_str) : ''; } form.no_sip.value = target.no_sip || ''; form.tgl_sip.value = target.tgl_sip ? formatDateForInput(target.tgl_sip) : ''; form.berlaku_sip.value = target.berlaku_sip ? formatDateForInput(target.berlaku_sip) : ''; form.nama_pasangan.value = target.nama_pasangan || ''; form.jml_anak.value = target.jml_anak || '0'; form.no_kontak_saudara.value = target.no_kontak_saudara || ''; showSection('input-data'); showToast('Mode edit aktif', 'info');
+    function parseIdDateSIP(str) {
+  if (!str || str === '-') return null;
+  var s = String(str).trim();
+  if (s.toLowerCase() === 'seumur hidup') return null;
+  var date = null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    // format ISO: yyyy-MM-dd
+    date = new Date(s);
+  } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    // format dd/MM/yyyy
+    var parts = s.split('/');
+    date = new Date(parseInt(parts[2],10), parseInt(parts[1],10)-1, parseInt(parts[0],10));
+  } else {
+    date = new Date(s); // fallback terakhir
+  }
+  return (date && !isNaN(date.getTime())) ? date : null;
+}
+
+function getSipNotifList(thresholdDays) {
+  thresholdDays = thresholdDays || 90;
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var list = [];
+  (window.globalData || []).forEach(function(emp) {
+    var d = parseIdDateSIP(emp.berlaku_sip);
+    if (!d) return;
+    var diffDays = Math.round((d - today) / 86400000);
+    if (diffDays <= thresholdDays) {
+      list.push({ nama: emp.nama, nik: emp.nik, jabatan: emp.jabatan, tanggal: emp.berlaku_sip, sisaHari: diffDays });
+    }
+  });
+  list.sort(function(a, b) { return a.sisaHari - b.sisaHari; });
+  return list;
+}
+
+function renderSipNotifDropdown() {
+  var list = getSipNotifList(90);
+  var container = document.getElementById('sip-notif-list');
+  var badge = document.getElementById('notif-badge');
+  if (!container || !badge) return;
+  if (list.length === 0) {
+    badge.style.display = 'none';
+    container.innerHTML = '<div class="notif-empty">Tidak ada SIP yang akan berakhir dalam 3 bulan ke depan.</div>';
+    return;
+  }
+  badge.style.display = 'flex';
+  badge.className = 'badge count';
+  badge.innerText = list.length > 9 ? '9+' : list.length;
+  container.innerHTML = list.map(function(item) {
+    var isExpired = item.sisaHari < 0;
+    var statusClass = (isExpired || item.sisaHari <= 30) ? 'danger' : 'warn';
+    var statusText = isExpired ? 'Sudah berakhir ' + Math.abs(item.sisaHari) + ' hari lalu' : 'Berakhir dalam ' + item.sisaHari + ' hari';
+    return '<div class="notif-item ' + statusClass + '" onclick="handleSipNotifClick(\'' + String(item.nik).replace(/'/g, "\\'") + '\')">' +
+      '<div class="ni-name">' + item.nama + '</div>' +
+      '<div class="ni-sub">' + (item.jabatan || '-') + ' &middot; SIP berlaku s.d. ' + item.tanggal + '</div>' +
+      '<span class="ni-badge">' + statusText + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function updateSipNotifications() { renderSipNotifDropdown(); }
+
+function toggleSipNotifDropdown() {
+  var dd = document.getElementById('sip-notif-dropdown');
+  if (!dd) return;
+  var willShow = (dd.style.display === 'none' || dd.style.display === '');
+  dd.style.display = willShow ? 'block' : 'none';
+  if (willShow) renderSipNotifDropdown();
+}
+
+function handleSipNotifClick(nik) {
+  document.getElementById('sip-notif-dropdown').style.display = 'none';
+  if (window.currentUserRole === 'SuperAdmin') {
+    showSection('personal');
+    setTimeout(function() { showDetailProfile(nik); }, 200);
+  }
+}
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('sip-notif-dropdown');
+  var btn = document.getElementById('btn-notif-sip');
+  if (!dd || dd.style.display === 'none') return;
+  if (dd.contains(e.target) || (btn && btn.contains(e.target))) return;
+  dd.style.display = 'none';
+});
+  };
+  window.cancelEditMode = function() {
+    window.currentEditNik = null;
+    document.getElementById('formPegawai').reset();
+    document.getElementById('form-title').innerText = "Form Registrasi Pegawai Baru";
+    document.getElementById('menu-input-text').innerText = "Input Pegawai Baru";
+    document.getElementById('btn-submit-form').innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i>Simpan Data Pegawai';
+    document.getElementById('btn-cancel-edit').style.display = "none";
+    var fotoPreview = document.getElementById('foto-preview'); if (fotoPreview) fotoPreview.src = defaultPhoto();
+    var fotoUrl = document.getElementById('foto-url'); if (fotoUrl) fotoUrl.value = '';
+    var fotoInput = document.getElementById('foto-pegawai'); if (fotoInput) fotoInput.value = '';
+    forceRefreshIcons();
+  };
+  window.hapusPegawai = function(nik, nama) {
+    if (!isAdmin()) { showToast('Fitur hapus hanya tersedia untuk Admin', 'warning'); return; }
+    if(confirm('Hapus data pegawai: ' + nama + '?\nTindakan ini tidak dapat dibatalkan.')) {
+      google.script.run.withSuccessHandler(function(res) {
+        showToast(res.message, res.status === 'success' ? 'success' : 'error'); loadDashboard();
+        if(document.querySelector('.section.active').id === 'view-section') { fetchTableData(window.currentActiveType); }
+      }).deletePegawai(nik, window.currentUserRole);
+    }
+  };
+  window.promptMutasi = function(nik, nama) {
+  if (!isAdmin()) { showToast('Fitur mutasi hanya tersedia untuk Admin', 'warning'); return; }
+  var keterangan = prompt('Mutasi pegawai: ' + nama + '\nMasukkan keterangan tujuan mutasi (opsional):', '');
+  if (keterangan === null) return; // dibatalkan
+  if (!confirm('Pindahkan "' + nama + '" ke Data Mutasi Pegawai?\nData akan hilang dari daftar pegawai aktif.')) return;
+  google.script.run.withSuccessHandler(function(res) {
+    showToast(res.message, res.status === 'success' ? 'success' : 'error');
+    loadDashboard();
+    if (document.querySelector('.section.active') && document.querySelector('.section.active').id === 'view-section') {
+      fetchTableData(window.currentActiveType);
+    }
+  }).withFailureHandler(function(err) {
+    showToast('Gagal memutasi pegawai: ' + err.message, 'error');
+  }).mutasiPegawai(nik, keterangan, window.currentUserRole);
+};
+
+window.fetchMutasiData = function() {
+  var tbody = document.getElementById('mutasi-table-body');
+  tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:60px;'><div class='spinner'></div></td></tr>";
+  if (typeof google === "undefined" || !google.script) return;
+  google.script.run.withSuccessHandler(function(res) {
+    var parsed = JSON.parse(res);
+    renderMutasiRows(parsed.employees || []);
+  }).getMutasiData();
+};
+
+window.renderMutasiRows = function(items) {
+  var tbody = document.getElementById('mutasi-table-body');
+  if (!items || items.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='8' style='text-align:center;padding:60px;color:var(--text-muted);'>Belum ada data mutasi pegawai</td></tr>";
+    return;
+  }
+  tbody.innerHTML = items.map(function(e, i) {
+    var statusClass = (e.status || '').toLowerCase();
+    return '<tr><td>' + (i + 1) + '</td><td>' +
+      '<button type="button" class="action-icon" onclick="kembalikanMutasi(\'' + escapeAttr(e.nik) + '\', \'' + escapeAttr(e.nama) + '\')" title="Kembalikan ke Data Pegawai" aria-label="Kembalikan"><i data-lucide="corner-up-left"></i></button></td>' +
+      '<td><b>' + safeText(e.nama) + '</b></td><td>' + safeText(e.nik) + '</td><td>' + safeText(e.jabatan) + '</td>' +
+      '<td><span class="status-badge ' + statusClass + '">' + safeText(e.status) + '</span></td>' +
+      '<td>' + safeText(e.tanggal_mutasi) + '</td><td>' + safeText(e.keterangan_mutasi) + '</td></tr>';
+  }).join('');
+  forceRefreshIcons();
+};
+
+window.kembalikanMutasi = function(nik, nama) {
+  if (!isAdmin()) { showToast('Hanya Admin yang dapat mengembalikan data mutasi', 'warning'); return; }
+  if (!confirm('Kembalikan "' + nama + '" ke Data Pegawai aktif?')) return;
+  google.script.run.withSuccessHandler(function(res) {
+    showToast(res.message, res.status === 'success' ? 'success' : 'error');
+    fetchMutasiData();
+    loadDashboard();
+  }).kembalikanMutasiPegawai(nik, window.currentUserRole);
+};
+  window.submitData = function() {
+    if (!isAdmin()) { showToast('Hanya Admin yang dapat menyimpan/mengubah data pegawai', 'warning'); return; }
+    var form = document.getElementById('formPegawai');
+    if (!form.checkValidity()) { showToast("Mohon lengkapi field yang wajib diisi", 'warning'); return; }
+    if (typeof syncTglLulusHidden === 'function') syncTglLulusHidden();
+    var formDataObj = {};
+    new FormData(form).forEach(function(value, key) {
+      if (value && value.name && value.size !== undefined) return;
+      formDataObj[key] = value;
+    });
+    if (typeof window.getAdditionalStructureAssignments === 'function') {
+      formDataObj.struktur_tambahan_json = JSON.stringify(window.getAdditionalStructureAssignments());
+    }
+    var strSelect = document.getElementById('berlaku_str_select');
+    if (strSelect && strSelect.value === 'custom') {
+      var strDateEl = document.getElementById('berlaku_str_date');
+      formDataObj.berlaku_str = strDateEl ? strDateEl.value : '';
+    }
+    if (!formDataObj.foto_url) formDataObj.foto_url = (document.getElementById('foto-url') || {}).value || '';
+    uploadSelectedPhoto(formDataObj, function(payload) {
+      if (window.currentEditNik) {
+        google.script.run.withSuccessHandler(function(res) {
+          showToast(res.message, res.status === 'success' ? 'success' : 'error');
+          loadDashboard();
+          cancelEditMode(); showSection('dashboard');
+        }).updatePegawai(window.currentEditNik, payload, window.currentUserRole, window.currentUserNik);
+      } else {
+        google.script.run.withSuccessHandler(function(res) {
+          showToast(res.message, res.status === 'success' ? 'success' : 'error');
+          form.reset();
+          var preview = document.getElementById('foto-preview'); if (preview) preview.src = defaultPhoto();
+          loadDashboard();
+        }).savePegawai(payload);
+      }
+    });
+  };
+  window.tampilPegawaiPuskesmas = function() { window.currentActiveType = "SELURUH"; document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.menu-btn').forEach(function(b) { b.classList.remove('active-menu'); }); document.getElementById('view-section').classList.add('active'); var menu = document.getElementById('m-cetak'); if (menu) menu.classList.add('active-menu'); document.getElementById('view-title').innerText = "DATA SEMUA PEGAWAI"; updateBreadcrumb("Semua Pegawai"); document.getElementById('filter-jabatan').value = "ALL"; document.getElementById('sort-data').value = "MANUAL"; fetchTableData("SELURUH"); forceRefreshIcons(); };
+  // showSection: menu "input-data" (form tambah/edit) sekarang bersifat admin-only murni --
+  // Pegawai tidak lagi dialihkan ke mode edit data sendiri, karena mereka memang tidak boleh edit.
+  window.showSection = function(id) {
+    if (!isAdmin() && ['view-asn', 'view-pppk', 'view-pjlp', 'upload', 'manage-users', 'input-data', 'mutasi'].indexOf(id) >= 0) { showToast('Menu ini hanya untuk Admin', 'warning'); return; }
+    baseShowSection(id);
+    if (!isAdmin() && id === 'personal') setTimeout(showOwnProfile, 100);
+    if (id === 'manage-users' && isAdmin()) loadUserList();
+  };
+  window.logout = function() { if (confirm("Apakah Anda yakin ingin keluar?")) { document.getElementById('login-page').style.display = 'flex'; document.getElementById('app').classList.remove('active'); document.body.classList.remove('employee-mode'); window.currentUserRole = null; window.currentUserNik = null; window.currentUserDisplayName = null; window.globalData = []; document.getElementById('user').value = ''; document.getElementById('pass').value = ''; window.currentEditNik = null; baseShowSection('dashboard'); } };
+  document.addEventListener("DOMContentLoaded", function() { cacheProfileTemplate(); forceRefreshIcons(); });
+})();
+function formatDateForInput(dateString) {
+  if (!dateString || dateString === "" || dateString === "-") return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+  var parts = dateString.split('/');
+  if (parts.length === 3) {
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+  }
+  return ""; 
+}
+</script>
+
+
+<script>
+/* Mobile viewport stabilizer — hanya mengatur tinggi visual viewport */
+(function () {
+  function syncMobileViewport() {
+    var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--simpeg-vh', h + 'px');
+    var app = document.getElementById('app');
+    if (app && window.innerWidth <= 768) app.style.height = h + 'px';
+  }
+  window.addEventListener('resize', syncMobileViewport, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(syncMobileViewport, 250); }, {passive:true});
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', syncMobileViewport, {passive:true});
+  document.addEventListener('DOMContentLoaded', syncMobileViewport);
+})();
+</script>
+<!-- SIMPEG KLASTER FINAL: 3 FIELD + DIAGRAM ORGANISASI MODERN -->
+<style id="simpeg-cluster-final-style">
+.simpeg-cluster-form-note{grid-column:1/-1;padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;font-size:12px}
+.simpeg-org-shell{margin:24px 0;padding:28px;border:1px solid #e2e8f0;border-radius:24px;background:linear-gradient(145deg,#ffffff,#f8fafc);box-shadow:0 18px 45px rgba(15,23,42,.08)}
+.simpeg-org-head{text-align:center;margin-bottom:26px}.simpeg-org-kicker{font-size:10px;font-weight:800;letter-spacing:2px;color:#64748b}.simpeg-org-title{font-size:28px;font-weight:800;color:#0f172a;margin:4px 0}.simpeg-org-sub{font-size:12px;color:#64748b}.simpeg-org-section-title{text-align:center;font-size:11px;font-weight:800;letter-spacing:1.6px;color:#475569;margin:14px 0}.simpeg-org-pj{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}.simpeg-org-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.simpeg-org-card{position:relative;text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px 14px;box-shadow:0 8px 24px rgba(15,23,42,.07);transition:transform .2s,box-shadow .2s}.simpeg-org-card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(15,23,42,.12)}.simpeg-org-photo{width:78px;height:94px;object-fit:cover;border-radius:14px;border:3px solid #e0e7ff;background:#eef2ff}.simpeg-org-role{font-size:9px;font-weight:800;letter-spacing:1.2px;color:#6366f1;margin-top:10px}.simpeg-org-name{font-size:14px;font-weight:800;color:#0f172a;margin-top:4px}.simpeg-org-desc{font-size:11px;line-height:1.5;color:#64748b;margin-top:7px}.simpeg-org-connector{width:2px;height:30px;background:#cbd5e1;margin:0 auto}.simpeg-org-empty{padding:20px;text-align:center;color:#94a3b8;border:1px dashed #cbd5e1;border-radius:14px;grid-column:1/-1}.simpeg-cluster-badge{display:inline-flex;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#4f46e5;font-size:10px;font-weight:800;margin-top:8px}
+@media(max-width:768px){.simpeg-org-shell{padding:17px}.simpeg-org-title{font-size:22px}.simpeg-org-grid{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+'use strict';
+var CLUSTERS=['Klaster 1','Klaster 2','Klaster 3','Klaster 4','Lintas Klaster'];
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+function getRole(e){var r=String(e.status_peran||e.peran_klaster||'').toLowerCase(),j=String(e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'').toLowerCase();if(r.indexOf('penanggung')>=0||r.indexOf('pj')>=0||j.indexOf('penanggung')>=0)return 'pj';if(r.indexOf('koordinator')>=0||j.indexOf('koordinator')>=0)return 'koor';return 'anggota';}
+function roleLabel(t){return t==='pj'?'PENANGGUNG JAWAB':t==='koor'?'KOORDINATOR':'ANGGOTA';}
+function desc(e){return e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'';}
+function photo(e){return e.foto_url||'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto';}
+function card(e,t){return '<div class="simpeg-org-card"><img class="simpeg-org-photo" src="'+esc(photo(e))+'" onerror="this.src=\'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto\'">'+'<div class="simpeg-org-role">'+roleLabel(t)+'</div><div class="simpeg-org-name">'+esc(e.nama||'-')+'</div>'+(desc(e)?'<div class="simpeg-org-desc">'+esc(desc(e))+'</div>':'')+'</div>'; }
+function renderOrg(){ return; }function updateForm(){var form=document.getElementById('formPegawai');if(!form)return;var old=form.querySelectorAll('[name="klaster"],[name="peran_klaster"],[name="penanggung_jawab_dan_koordinator"],[name="Penanggung Jawab Dan Koordinator"]');old.forEach(function(x){var g=x.closest('.form-group');if(g)g.remove();else x.remove();});var ref=form.querySelector('.form-grid');if(!ref)return;var box=document.createElement('div');box.className='simpeg-cluster-form-note';box.innerHTML='<b>Informasi Klaster:</b> pilih klaster dan status peran, lalu tuliskan jabatan/peran spesifik sesuai struktur organisasi.';ref.prepend(box);var fields=document.createElement('div');fields.className='form-group';fields.innerHTML='<label class="required">Jenis Klaster</label><select name="klaster" required><option value="">Pilih Klaster</option>'+CLUSTERS.map(function(x){return '<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')+'</select>';ref.insertBefore(fields,ref.children[1]);var role=document.createElement('div');role.className='form-group';role.innerHTML='<label class="required">Status Peran</label><select name="peran_klaster" required><option value="">Pilih Status Peran</option><option value="Penanggung Jawab">Penanggung Jawab</option><option value="Koordinator">Koordinator</option><option value="Anggota">Anggota</option></select>';ref.insertBefore(role,ref.children[2]);var descField=document.createElement('div');descField.className='form-group';descField.style.gridColumn='1/-1';descField.innerHTML='<label>Jabatan/Peran Klaster</label><input type="text" name="penanggung_jawab_dan_koordinator" placeholder="Contoh: Koordinator Manajemen Arsip" autocomplete="off">';ref.insertBefore(descField,ref.children[3]);}
+function hook(){if(window.__simpegClusterFinal)return;window.__simpegClusterFinal=true;var oldApply=window.applyFilterAndSort;if(typeof oldApply==='function'){window.applyFilterAndSort=function(){oldApply.apply(this,arguments);setTimeout(renderOrg,0);};}var oldRender=window.renderProfile;if(typeof oldRender==='function'){window.renderProfile=function(match){oldRender.apply(this,arguments);setTimeout(function(){var d=document.querySelector('.profile-details');if(!d)return;var x=d.querySelector('.simpeg-cluster-profile');if(x)x.remove();var box=document.createElement('div');box.className='simpeg-cluster-profile';box.innerHTML='<div class="form-section-title">Informasi Klaster</div><div class="profile-info-grid"><div class="info-item"><span>Jenis Klaster</span><p>'+esc(match.klaster||'-')+'</p></div><div class="info-item"><span>Status Peran</span><p>'+esc(match.status_peran||match.peran_klaster||'-')+'</p></div><div class="info-item"><span>Jabatan/Peran Klaster</span><p>'+esc(match.jabatan_peran_klaster||match.penanggung_jawab_dan_koordinator||'-')+'</p></div></div>';var st=Array.from(d.querySelectorAll('.form-section-title')).find(function(e){return e.textContent.trim().toLowerCase()==='status kepegawaian'});if(st)d.insertBefore(box,st);else d.appendChild(box);},0);};}updateForm();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(hook,1200);});else setTimeout(hook,1200);
+})();
+</script>
+
+
+<!-- SIMPEG: STRUKTUR ORGANISASI MENU TERPISAH - CONNECTOR V2 -->
+<style id="simpeg-org-menu-style">
+#simpeg-org-page{margin-top:4px}
+.simpeg-org-page-shell{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1px solid #e2e8f0;border-radius:26px;box-shadow:0 18px 50px rgba(15,23,42,.08);overflow:hidden}
+.simpeg-org-toolbar{padding:18px 22px;border-bottom:1px solid #e2e8f0;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.simpeg-org-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.simpeg-org-tab{border:1px solid #dbe3ee;background:#fff;color:#475569;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s}
+.simpeg-org-tab:hover{transform:translateY(-1px);border-color:#a5b4fc;color:#4f46e5}
+.simpeg-org-tab.active{background:#0f172a;color:#fff;border-color:#0f172a;box-shadow:0 7px 18px rgba(15,23,42,.15)}
+.simpeg-org-count{font-size:11px;color:#64748b;white-space:nowrap}.simpeg-org-canvas{padding:30px 28px 38px;overflow:auto}
+.simpeg-org-hero{text-align:center;margin-bottom:28px}.simpeg-org-kicker2{font-size:10px;letter-spacing:2.5px;font-weight:900;color:#6366f1}.simpeg-org-title2{font-size:30px;line-height:1.15;font-weight:900;color:#0f172a;margin:7px 0}.simpeg-org-sub2{font-size:12px;color:#64748b}
+.simpeg-org-stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}.simpeg-org-stat{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;font-size:11px;color:#475569}.simpeg-org-stat b{color:#0f172a}
+.simpeg-org-level{position:relative;margin-top:24px}.simpeg-org-level-title{text-align:center;font-size:10px;letter-spacing:1.8px;font-weight:900;color:#64748b;margin:0 0 12px}.simpeg-org-cards{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
+.simpeg-org-node{width:220px;background:#fff;border:1px solid #dbe3ee;border-radius:20px;padding:18px 15px;text-align:center;box-shadow:0 10px 28px rgba(15,23,42,.07);position:relative;z-index:2}.simpeg-org-node.pj{border-top:4px solid #4f46e5}.simpeg-org-node.koor{border-top:4px solid #0ea5e9}.simpeg-org-node.anggota{border-top:4px solid #14b8a6}.simpeg-org-node img{width:76px;height:92px;object-fit:cover;border-radius:15px;border:3px solid #eef2ff;background:#f8fafc}.simpeg-org-node .r{margin-top:9px;font-size:9px;letter-spacing:1.3px;font-weight:900;color:#6366f1}.simpeg-org-node.koor .r{color:#0284c7}.simpeg-org-node.anggota .r{color:#0f766e}.simpeg-org-node .n{font-size:14px;font-weight:900;color:#0f172a;margin-top:4px}.simpeg-org-node .d{font-size:11px;line-height:1.45;color:#64748b;margin-top:7px}
+.simpeg-org-vertical{width:2px;height:34px;background:#cbd5e1;margin:0 auto;position:relative;z-index:1}.simpeg-org-vertical:after{content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);border:5px solid transparent;border-top-color:#cbd5e1}
+.simpeg-org-koor-wrap,.simpeg-org-member-wrap{position:relative;padding:18px 12px 0}
+.simpeg-org-koor-wrap:before,.simpeg-org-member-wrap:before{content:"";position:absolute;top:0;left:calc(110px + 12px);right:calc(110px + 12px);height:2px;background:#cbd5e1;z-index:1}
+.simpeg-org-koor-wrap .simpeg-org-cards,.simpeg-org-member-wrap .simpeg-org-cards{position:relative;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:18px;overflow-x:auto;overflow-y:visible;padding:0 0 12px;scrollbar-width:thin}
+.simpeg-org-koor-wrap .simpeg-org-cards:before,.simpeg-org-member-wrap .simpeg-org-cards:before{content:"";position:absolute;top:-18px;left:50%;width:2px;height:18px;background:#cbd5e1;z-index:1}
+.simpeg-org-koor-wrap .simpeg-org-node:before,.simpeg-org-member-wrap .simpeg-org-node:before{content:"";position:absolute;left:50%;top:-18px;transform:translateX(-50%);width:2px;height:18px;background:#cbd5e1;z-index:1}
+.simpeg-org-koor-wrap .simpeg-org-node:after,.simpeg-org-member-wrap .simpeg-org-node:after{content:"";position:absolute;left:50%;top:-22px;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#cbd5e1;z-index:3}
+.simpeg-org-member-wrap{margin-top:8px}.simpeg-org-member-wrap:before{left:18%;right:18%}
+.simpeg-org-empty2{padding:25px;border:1px dashed #cbd5e1;border-radius:16px;color:#94a3b8;text-align:center;background:rgba(255,255,255,.65);width:100%;position:relative;z-index:2}
+.simpeg-org-connector-caption{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 0;color:#94a3b8;font-size:9px;font-weight:700;letter-spacing:.8px}.simpeg-org-connector-caption:before,.simpeg-org-connector-caption:after{content:"";width:42px;height:1px;background:#e2e8f0}
+.simpeg-org-footnote{margin-top:26px;text-align:center;font-size:10px;color:#94a3b8}.simpeg-org-loading{padding:70px;text-align:center;color:#64748b}.simpeg-org-spinner{width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:simpegOrgSpin .8s linear infinite;margin:0 auto 12px}@keyframes simpegOrgSpin{to{transform:rotate(360deg)}}
+@media(max-width:768px){
+.simpeg-org-toolbar{padding:14px}.simpeg-org-canvas{padding:20px 14px 28px}.simpeg-org-title2{font-size:24px}
+.simpeg-org-node{width:220px;flex:0 0 220px}.simpeg-org-koor-wrap,.simpeg-org-member-wrap{padding-left:4px;padding-right:4px}
+.simpeg-org-koor-wrap:before{left:110px;right:110px}.simpeg-org-member-wrap:before{left:15%;right:15%}
+.simpeg-org-koor-wrap .simpeg-org-cards,.simpeg-org-member-wrap .simpeg-org-cards{justify-content:flex-start}
+}
+</style>
+<script>
+(function(){
+  var CLUSTERS=['Klaster 1','Klaster 2','Klaster 3','Klaster 4','Lintas Klaster'];
+  function esc2(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+  function role2(e){var r=String(e.status_peran||e.peran_klaster||'').toLowerCase(),j=String(e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'').toLowerCase();if(r.indexOf('penanggung')>=0||r.indexOf('pj')>=0||j.indexOf('penanggung')>=0)return 'pj';if(r.indexOf('koordinator')>=0||j.indexOf('koordinator')>=0)return 'koor';return 'anggota';}
+  function desc2(e){return e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'';}
+  function img2(e){return e.foto_url||'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto';}
+  function structureRows2(employees){var out=[];employees.forEach(function(employee){var base=Object.assign({},employee);out.push(base);(employee.structure_assignments||[]).forEach(function(assignment){var copy=Object.assign({},employee,assignment);var same=String(copy.klaster||'').trim()===String(base.klaster||'').trim()&&String(copy.status_peran||copy.peran_klaster||'').trim()===String(base.status_peran||base.peran_klaster||'').trim()&&String(copy.jabatan_peran_klaster||copy.penanggung_jawab_dan_koordinator||'').trim()===String(base.jabatan_peran_klaster||base.penanggung_jawab_dan_koordinator||'').trim();if(!same)out.push(copy);});});return out;}
+  function node2(e,t){var label=t==='pj'?'PENANGGUNG JAWAB':t==='koor'?'KOORDINATOR':'ANGGOTA KLASTER';return '<div class="simpeg-org-node '+t+'"><img src="'+esc2(img2(e))+'" onerror="this.src=\'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto\'"><div class="r">'+label+'</div><div class="n">'+esc2(e.nama||'-')+'</div>'+(desc2(e)?'<div class="d">'+esc2(desc2(e))+'</div>':'')+'</div>';}
+  function draw(cluster){
+    var root=document.getElementById('simpeg-org-page'); if(!root)return;
+    var data=structureRows2(window.globalData||[]).filter(function(e){return String(e.klaster||'').trim().toLowerCase()===cluster.toLowerCase();});
+    var pj=data.filter(function(e){return role2(e)==='pj'}),ko=data.filter(function(e){return role2(e)==='koor'}),ag=data.filter(function(e){return role2(e)==='anggota'});
+    root.innerHTML='<div class="simpeg-org-page-shell"><div class="simpeg-org-toolbar"><div class="simpeg-org-tabs">'+CLUSTERS.map(function(c){return '<button type="button" class="simpeg-org-tab '+(c===cluster?'active':'')+'" data-cluster="'+esc2(c)+'">'+esc2(c)+'</button>';}).join('')+'</div><div class="simpeg-org-count">'+data.length+' pegawai dalam '+esc2(cluster)+'</div></div><div class="simpeg-org-canvas"><div class="simpeg-org-hero"><div class="simpeg-org-kicker2">STRUKTUR ORGANISASI</div><div class="simpeg-org-title2">'+esc2(cluster)+'</div><div class="simpeg-org-sub2">Penanggung Jawab → Koordinator → Anggota</div><div class="simpeg-org-stats"><span class="simpeg-org-stat"><b>'+pj.length+'</b> Penanggung Jawab</span><span class="simpeg-org-stat"><b>'+ko.length+'</b> Koordinator</span><span class="simpeg-org-stat"><b>'+ag.length+'</b> Anggota</span></div></div><div class="simpeg-org-level"><div class="simpeg-org-level-title">PENANGGUNG JAWAB</div><div class="simpeg-org-cards">'+(pj.length?pj.map(function(e){return node2(e,'pj')}).join(''):'<div class="simpeg-org-empty2">Belum ada Penanggung Jawab untuk klaster ini.</div>')+'</div></div><div class="simpeg-org-vertical"></div><div class="simpeg-org-level"><div class="simpeg-org-level-title">KOORDINATOR</div><div class="simpeg-org-koor-wrap"><div class="simpeg-org-cards">'+(ko.length?ko.map(function(e){return node2(e,'koor')}).join(''):'<div class="simpeg-org-empty2">Belum ada Koordinator untuk klaster ini.</div>')+'</div></div></div><div class="simpeg-org-vertical"></div><div class="simpeg-org-level simpeg-org-member-wrap"><div class="simpeg-org-level-title">ANGGOTA KLASTER</div><div class="simpeg-org-cards">'+(ag.length?ag.map(function(e){return node2(e,'anggota')}).join(''):'<div class="simpeg-org-empty2">Belum ada Anggota untuk klaster ini.</div>')+'</div></div><div class="simpeg-org-footnote">Data ditampilkan otomatis berdasarkan Jenis Klaster, Status Peran, dan Jabatan/Peran Klaster pada data pegawai.</div></div></div>';
+    root.querySelectorAll('.simpeg-org-tab').forEach(function(btn){btn.addEventListener('click',function(){draw(btn.getAttribute('data-cluster'));});});
+  }
+  function load(){
+    var root=document.getElementById('simpeg-org-page');if(!root)return;
+    if(window.globalData&&window.globalData.length){draw(window.__simpegOrgCluster||'Klaster 1');return;}
+    root.innerHTML='<div class="simpeg-org-page-shell"><div class="simpeg-org-loading"><div class="simpeg-org-spinner"></div>Memuat data struktur organisasi...</div></div>';
+    if(typeof google!=='undefined'&&google.script){google.script.run.withSuccessHandler(function(res){try{var p=JSON.parse(res);window.globalData=p.employees||[];draw(window.__simpegOrgCluster||'Klaster 1');}catch(e){root.innerHTML='<div class="simpeg-org-page-shell"><div class="simpeg-org-empty2">Data struktur tidak dapat dibaca.</div></div>';}}).withFailureHandler(function(err){root.innerHTML='<div class="simpeg-org-page-shell"><div class="simpeg-org-empty2">Gagal memuat data struktur organisasi.</div></div>';}).getAllPegawaiData();}
+  }
+  var oldShow=window.showSection;
+  if(typeof oldShow==='function'){
+    window.showSection=function(id){
+      oldShow.apply(this,arguments);
+      if(id==='struktur-organisasi'){window.__simpegOrgCluster=window.__simpegOrgCluster||'Klaster 1';setTimeout(load,80);}
+    };
+  }
+  window.addEventListener('load',function(){if(window.lucide&&window.lucide.createIcons)window.lucide.createIcons();});
+})();
+</script>
+
+<!-- STRUKTUR ILP: BAGAN GABUNGAN SELURUH KLASTER -->
+<style id="simpeg-ilp-structure-style">
+  .simpeg-ilp-wrap { padding: 30px 28px 38px; overflow: auto; }
+  .simpeg-ilp-hero { text-align: center; margin-bottom: 24px; }
+  .simpeg-ilp-kicker { font-size: 10px; font-weight: 900; letter-spacing: 2.4px; color: #0891b2; }
+  .simpeg-ilp-title { margin: 6px 0; color: #0f172a; font-size: 30px; font-weight: 900; line-height: 1.15; }
+  .simpeg-ilp-subtitle { color: #64748b; font-size: 12px; }
+  .simpeg-ilp-leader { display: flex; justify-content: center; margin: 22px 0 0; }
+  .simpeg-ilp-line { width: 2px; height: 28px; background: #bae6fd; margin: 0 auto; }
+  .simpeg-ilp-grid { display: grid; grid-template-columns: repeat(5, minmax(210px, 1fr)); gap: 14px; min-width: 1120px; }
+  .simpeg-ilp-cluster { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border: 1px solid #dbeafe; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 22px rgba(15,23,42,.06); }
+  .simpeg-ilp-cluster-head { padding: 12px 14px; background: linear-gradient(135deg, #0e7490, #0891b2); color: #fff; text-align: center; font-weight: 900; font-size: 12px; letter-spacing: .25px; }
+  .simpeg-ilp-cluster-body { padding: 12px; display: grid; gap: 10px; }
+  .simpeg-ilp-role { color: #64748b; font-size: 9px; font-weight: 900; letter-spacing: 1.1px; text-align: center; margin: 2px 0 0; }
+  .simpeg-ilp-node { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid var(--ilp-accent, #14b8a6); border-radius: 11px; padding: 9px; display: flex; align-items: center; gap: 8px; text-align: left; }
+  .simpeg-ilp-node.pj { --ilp-accent: #4f46e5; } .simpeg-ilp-node.koor { --ilp-accent: #0284c7; } .simpeg-ilp-node.anggota { --ilp-accent: #14b8a6; }
+  .simpeg-ilp-photo { width: 35px; height: 42px; flex: 0 0 35px; object-fit: cover; border-radius: 8px; background: #e2e8f0; }
+  .simpeg-ilp-name { color: #0f172a; font-size: 10px; font-weight: 900; line-height: 1.3; }
+  .simpeg-ilp-desc { color: #64748b; font-size: 9px; line-height: 1.35; margin-top: 2px; }
+  .simpeg-ilp-empty { color: #94a3b8; font-size: 10px; text-align: center; padding: 10px 6px; border: 1px dashed #cbd5e1; border-radius: 10px; }
+  @media(max-width:768px) { .simpeg-ilp-wrap { padding: 20px 14px 28px; } .simpeg-ilp-title { font-size: 24px; } .simpeg-ilp-grid { gap: 10px; } }
+</style>
+<script>
+/* Menambahkan tab Struktur ILP tanpa mengubah sumber data pegawai. */
+(function () {
+  var clusters = ['Klaster 1', 'Klaster 2', 'Klaster 3', 'Klaster 4', 'Lintas Klaster'];
+  var defaultPhoto = 'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto';
+  function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function role(employee) {
+    var value = String(employee.status_peran || employee.peran_klaster || employee.jabatan_peran_klaster || employee.penanggung_jawab_dan_koordinator || '').toLowerCase();
+    if (value.indexOf('penanggung') >= 0 || value.indexOf(' pj') >= 0) return 'pj';
+    if (value.indexOf('koordinator') >= 0) return 'koor';
+    return 'anggota';
+  }
+  function node(employee, type) {
+    var photo = employee.foto_url || defaultPhoto;
+    var description = employee.jabatan_peran_klaster || employee.penanggung_jawab_dan_koordinator || employee.jabatan || '-';
+    return '<div class="simpeg-ilp-node ' + type + '"><img class="simpeg-ilp-photo" src="' + esc(photo) + '" onerror="this.src=\'' + defaultPhoto + '\'"><div><div class="simpeg-ilp-name">' + esc(employee.nama || '-') + '</div><div class="simpeg-ilp-desc">' + esc(description) + '</div></div></div>';
+  }
+  function clusterColumn(name, employees) {
+    var buckets = { pj: [], koor: [], anggota: [] };
+    employees.forEach(function (employee) { buckets[role(employee)].push(employee); });
+    var parts = [['pj', 'PENANGGUNG JAWAB'], ['koor', 'KOORDINATOR'], ['anggota', 'ANGGOTA']].map(function (item) {
+      return '<div class="simpeg-ilp-role">' + item[1] + '</div>' + (buckets[item[0]].length ? buckets[item[0]].map(function (employee) { return node(employee, item[0]); }).join('') : '<div class="simpeg-ilp-empty">Belum ada data</div>');
+    }).join('');
+    return '<section class="simpeg-ilp-cluster"><div class="simpeg-ilp-cluster-head">' + esc(name) + '</div><div class="simpeg-ilp-cluster-body">' + parts + '</div></section>';
+  }
+  function renderIlp() {
+    var root = document.getElementById('simpeg-org-page');
+    if (!root) return;
+    var data = [];
+    (window.globalData || []).forEach(function (employee) {
+      var base = Object.assign({}, employee); data.push(base);
+      (employee.structure_assignments || []).forEach(function (assignment) {
+        var copy = Object.assign({}, employee, assignment);
+        var same = String(copy.klaster || '').trim() === String(base.klaster || '').trim() && String(copy.status_peran || copy.peran_klaster || '').trim() === String(base.status_peran || base.peran_klaster || '').trim() && String(copy.jabatan_peran_klaster || copy.penanggung_jawab_dan_koordinator || '').trim() === String(base.jabatan_peran_klaster || base.penanggung_jawab_dan_koordinator || '').trim();
+        if (!same) data.push(copy);
+      });
+    });
+    // \s adalah karakter spasi pada regular expression. Dengan ini, nilai
+    // "Kepala Puskesmas" dari Status Peran maupun Jabatan dikenali sebagai pimpinan ILP.
+    var leader = data.find(function (employee) { return /kepala\s+puskesmas/i.test(String(employee.jabatan || '') + ' ' + String(employee.status_peran || employee.peran_klaster || '') + ' ' + String(employee.jabatan_peran_klaster || '')); });
+    var leaderHtml = leader ? node(leader, 'pj') : '<div class="simpeg-ilp-empty">Kepala Puskesmas belum ditandai pada data pegawai.</div>';
+    root.innerHTML = '<div class="simpeg-org-page-shell"><div class="simpeg-org-toolbar"><div class="simpeg-org-tabs"><button type="button" class="simpeg-org-tab active" data-ilp-tab="true">Struktur ILP</button>' + clusters.map(function (cluster) { return '<button type="button" class="simpeg-org-tab" data-cluster="' + esc(cluster) + '">' + esc(cluster) + '</button>'; }).join('') + '</div><div class="simpeg-org-count">Bagan gabungan 5 klaster</div></div><div class="simpeg-ilp-wrap"><div class="simpeg-ilp-hero"><div class="simpeg-ilp-kicker">INTEGRASI LAYANAN PRIMER</div><h2 class="simpeg-ilp-title">Struktur Organisasi ILP</h2><div class="simpeg-ilp-subtitle">UPTD Puskesmas Bojongsari — Klaster 1 s.d. 4 dan Lintas Klaster</div></div><div class="simpeg-ilp-leader">' + leaderHtml + '</div><div class="simpeg-ilp-line"></div><div class="simpeg-ilp-grid">' + clusters.map(function (cluster) { return clusterColumn(cluster, data.filter(function (employee) { return String(employee.klaster || '').trim().toLowerCase() === cluster.toLowerCase(); })); }).join('') + '</div></div></div>';
+    root.querySelectorAll('[data-cluster]').forEach(function (button) { button.addEventListener('click', function () { window.__simpegOrgCluster = button.getAttribute('data-cluster'); window.showSection('struktur-organisasi'); }); });
+  }
+  function addIlpTab() {
+    var root = document.getElementById('simpeg-org-page');
+    if (!root || root.querySelector('[data-ilp-tab]')) return;
+    var tabs = root.querySelector('.simpeg-org-tabs');
+    if (!tabs) return;
+    var button = document.createElement('button');
+    button.type = 'button'; button.className = 'simpeg-org-tab'; button.setAttribute('data-ilp-tab', 'true'); button.textContent = 'Struktur ILP';
+    button.addEventListener('click', renderIlp);
+    tabs.insertBefore(button, tabs.firstChild);
+  }
+  var observer = new MutationObserver(function () { addIlpTab(); });
+  window.addEventListener('load', function () { var root = document.getElementById('simpeg-org-page'); if (root) observer.observe(root, { childList: true, subtree: true }); });
+  window.renderStrukturILP = renderIlp;
+})();
+</script>
+
+<script>
+/* Kolom klaster bersifat opsional; Kepala Puskesmas tersedia sebagai Status Peran. */
+(function () {
+  function configureClusterFields() {
+    var form = document.getElementById('formPegawai');
+    if (!form) return;
+    ['klaster', 'peran_klaster'].forEach(function (name) {
+      var field = form.querySelector('[name="' + name + '"]');
+      if (field) field.required = false;
+      var label = field && field.closest('.form-group') && field.closest('.form-group').querySelector('label');
+      if (label) label.classList.remove('required');
+    });
+    var role = form.querySelector('[name="peran_klaster"]');
+    if (role && !role.querySelector('option[value="Kepala Puskesmas"]')) {
+      var option = document.createElement('option');
+      option.value = 'Kepala Puskesmas'; option.textContent = 'Kepala Puskesmas';
+      role.insertBefore(option, role.children[1] || null);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    configureClusterFields();
+    setTimeout(configureClusterFields, 1400);
+    var form = document.getElementById('formPegawai');
+    if (form) new MutationObserver(configureClusterFields).observe(form, { childList: true, subtree: true });
+  });
+})();
+</script>
+
+<script>
+/* Selalu gunakan data terbaru saat Struktur Organisasi dibuka.
+   Ini mencegah akun Admin melihat cache sebelum perubahan Status Peran tersimpan. */
+(function () {
+  var previousShowSection = window.showSection;
+  if (typeof previousShowSection !== 'function') return;
+  window.showSection = function (id) {
+    if (id !== 'struktur-organisasi' || typeof google === 'undefined' || !google.script) {
+      return previousShowSection.apply(this, arguments);
+    }
+    var args = arguments;
+    google.script.run
+      .withSuccessHandler(function (response) {
+        try {
+          var data = typeof response === 'string' ? JSON.parse(response) : response;
+          window.globalData = data && data.employees ? data.employees : [];
+        } catch (error) {
+          console.warn('Data Struktur Organisasi tidak dapat dibaca.', error);
+        }
+        previousShowSection.apply(window, args);
+      })
+      .withFailureHandler(function (error) {
+        console.warn('Gagal memperbarui Struktur Organisasi.', error);
+        previousShowSection.apply(window, args);
+      })
+      .getAllPegawaiData();
+  };
+})();
+</script>
+
+<style>
+  .struktur-tambahan { margin: 18px 0 0; padding: 16px; border: 1px dashed #38bdf8; border-radius: 12px; background: #f0f9ff; }
+  .struktur-tambahan h3 { margin: 0 0 5px; font-size: 14px; color: #075985; }
+  .struktur-tambahan p { margin: 0 0 12px; font-size: 12px; color: #475569; }
+  .struktur-tambahan-row { display: grid; grid-template-columns: 1fr 1fr 2fr auto; gap: 8px; margin: 8px 0; }
+  .struktur-tambahan-row select, .struktur-tambahan-row input { width: 100%; min-width: 0; padding: 9px; border: 1px solid #bae6fd; border-radius: 7px; background: #fff; }
+  .struktur-remove { border: 0; border-radius: 7px; padding: 0 11px; color: #b91c1c; background: #fee2e2; cursor: pointer; }
+  @media (max-width: 700px) { .struktur-tambahan-row { grid-template-columns: 1fr; } .struktur-remove { min-height: 34px; } }
+</style>
+<script>
+/* Penugasan tambahan: terpisah dari data induk pegawai. */
+(function () {
+  var CLUSTERS = ['Klaster 1', 'Klaster 2', 'Klaster 3', 'Klaster 4', 'Lintas Klaster'];
+  var ROLES = ['Penanggung Jawab', 'Koordinator', 'Anggota'];
+  function addRow(value) {
+    var list = document.getElementById('struktur-tambahan-list'); if (!list) return;
+    value = value || {};
+    var row = document.createElement('div'); row.className = 'struktur-tambahan-row';
+    function options(items, selected, placeholder) { return '<option value="">' + placeholder + '</option>' + items.map(function (item) { return '<option value="' + item + '"' + (item === selected ? ' selected' : '') + '>' + item + '</option>'; }).join(''); }
+    row.innerHTML = '<select class="sa-klaster">' + options(CLUSTERS, value.klaster, 'Pilih klaster') + '</select>' +
+      '<select class="sa-peran">' + options(ROLES, value.status_peran || value.peran_klaster, 'Pilih peran') + '</select>' +
+      '<input class="sa-jabatan" type="text" placeholder="Jabatan/peran di klaster ini" value="' + String(value.jabatan_peran_klaster || value.penanggung_jawab_dan_koordinator || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '">' +
+      '<button class="struktur-remove" type="button" title="Hapus penugasan">Hapus</button>';
+    row.querySelector('.struktur-remove').addEventListener('click', function () { row.remove(); }); list.appendChild(row);
+  }
+  function setAssignments(items) { var list = document.getElementById('struktur-tambahan-list'); if (!list) return; list.innerHTML = ''; (items || []).forEach(addRow); }
+  function ensureEditor() {
+    var form = document.getElementById('formPegawai'); if (!form || document.getElementById('struktur-tambahan-editor')) return;
+    var box = document.createElement('section'); box.id = 'struktur-tambahan-editor'; box.className = 'struktur-tambahan';
+    box.innerHTML = '<h3>Penugasan Struktur Tambahan</h3><p>Tambahkan jika pegawai yang sama memiliki peran di klaster lain. Data pegawai utama tidak akan diduplikasi.</p><div id="struktur-tambahan-list"></div><button type="button" class="btn-secondary" id="tambah-struktur-tambahan">+ Tambah klaster/peran tambahan</button>';
+    form.appendChild(box); document.getElementById('tambah-struktur-tambahan').addEventListener('click', function () { addRow(); });
+    form.addEventListener('reset', function () { setTimeout(function () { setAssignments([]); }, 0); });
+  }
+  window.getAdditionalStructureAssignments = function () {
+    return Array.prototype.slice.call(document.querySelectorAll('#struktur-tambahan-list .struktur-tambahan-row')).map(function (row) {
+      return { klaster: row.querySelector('.sa-klaster').value, status_peran: row.querySelector('.sa-peran').value, jabatan_peran_klaster: row.querySelector('.sa-jabatan').value.trim() };
+    }).filter(function (item) { return item.klaster; });
+  };
+  function setup() {
+    ensureEditor();
+    var previousEdit = window.editPegawai;
+    if (typeof previousEdit === 'function' && !previousEdit.__strukturTambahan) {
+      window.editPegawai = function (nik) {
+        previousEdit.apply(this, arguments);
+        var target = (window.globalData || []).find(function (employee) { return String(employee.nik) === String(nik); });
+        setAssignments(target && target.structure_assignments || []);
+      };
+      window.editPegawai.__strukturTambahan = true;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () { setup(); setTimeout(setup, 1600); });
+})();
+</script>
+</body>
+</html>
 
