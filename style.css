@@ -1,1 +1,415 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #004d40,
+            #00695c,
+            #00897b,
+            #26a69a
+        );
+}
+
+
+/* ==========================================
+   BACKGROUND
+========================================== */
+
+.background {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(255,255,255,.15),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(255,255,255,.10),
+            transparent 30%
+        );
+
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   CONTAINER
+========================================== */
+
+.container {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+/* ==========================================
+   CARD
+========================================== */
+
+.card {
+
+    width: 100%;
+    max-width: 520px;
+
+    padding: 45px 35px;
+
+    text-align: center;
+
+    background:
+        rgba(255,255,255,.12);
+
+    border:
+        1px solid
+        rgba(255,255,255,.25);
+
+    border-radius: 28px;
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 25px 60px
+        rgba(0,0,0,.25);
+
+    animation:
+        cardIn .8s ease;
+}
+
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.logo {
+    display: flex;
+
+    justify-content: center;
+
+    margin-bottom: 20px;
+}
+
+.logo-icon {
+
+    width: 90px;
+    height: 90px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #00796b;
+
+    font-size: 42px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.20);
+}
+
+
+/* ==========================================
+   BADGE
+========================================== */
+
+.badge {
+
+    display: inline-block;
+
+    padding: 7px 15px;
+
+    margin-bottom: 15px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,.18);
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* ==========================================
+   TEXT
+========================================== */
+
+h1 {
+
+    font-size: 42px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+}
+
+h2 {
+
+    font-size: 18px;
+
+    font-weight: 500;
+
+    margin-bottom: 8px;
+}
+
+#appDescription {
+
+    font-size: 14px;
+
+    opacity: .85;
+
+    letter-spacing: .5px;
+}
+
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.loading-area {
+
+    margin:
+        30px 0 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    font-size: 13px;
+
+    opacity: .85;
+}
+
+.spinner {
+
+    width: 20px;
+    height: 20px;
+
+    border:
+        3px solid
+        rgba(255,255,255,.3);
+
+    border-top-color:
+        #ffffff;
+
+    border-radius: 50%;
+
+    animation:
+        spin .8s linear infinite;
+}
+
+
+/* ==========================================
+   BUTTON
+========================================== */
+
+.button {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+
+    width: 100%;
+
+    padding: 16px 25px;
+
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    color: #00695c;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 800;
+
+    letter-spacing: .5px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.20);
+
+    transition:
+        transform .25s,
+        box-shadow .25s;
+}
+
+.button:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(0,0,0,.30);
+}
+
+.arrow {
+
+    font-size: 22px;
+
+    transition:
+        transform .25s;
+}
+
+.button:hover .arrow {
+
+    transform:
+        translateX(5px);
+}
+
+
+/* ==========================================
+   SECURITY
+========================================== */
+
+.security {
+
+    margin-top: 20px;
+
+    font-size: 11px;
+
+    opacity: .65;
+}
+
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+footer {
+
+    margin-top: 25px;
+
+    font-size: 11px;
+
+    opacity: .55;
+}
+
+
+/* ==========================================
+   ANIMATION
+========================================== */
+
+@keyframes spin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+@keyframes cardIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(30px)
+            scale(.96);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .card {
+
+        padding:
+            35px 22px;
+
+        border-radius:
+            22px;
+    }
+
+    h1 {
+
+        font-size:
+            34px;
+    }
+
+    h2 {
+
+        font-size:
+            16px;
+    }
+
+    .logo-icon {
+
+        width: 75px;
+        height: 75px;
+
+        font-size:
+            35px;
+    }
+}
