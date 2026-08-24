@@ -1446,6 +1446,168 @@ img, svg, canvas, video, iframe { max-width: 100%; }
 }
 
 </style>
+
+<style id="dashboard-professional-upgrade">
+/* =========================================================
+   DASHBOARD PROFESSIONAL UPGRADE
+   - Total Pegawai lebih besar & menonjol
+   - KPI diberi warna/gradient profesional
+   - Kategori Utama & Pendukung TETAP dipertahankan
+   ========================================================= */
+#dashboard .dashboard-grid {
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+#dashboard .stat-card {
+  min-height: 190px;
+  padding: 22px;
+  border: 1px solid transparent;
+  box-shadow: 0 14px 34px rgba(15,23,42,.08);
+}
+
+#dashboard .stat-card::after {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -70px;
+  bottom: -90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.13);
+  pointer-events: none;
+}
+
+#dashboard .stat-card.indigo {
+  --card-accent: linear-gradient(90deg,#2563eb,#4f46e5);
+  --icon-bg: rgba(255,255,255,.18);
+  --icon-color: #fff;
+  --trend-bg: rgba(255,255,255,.16);
+  --trend-color: #fff;
+  background: linear-gradient(135deg,#2563eb 0%,#315ee8 52%,#4f46e5 100%);
+  color: #fff;
+  border-color: rgba(255,255,255,.22);
+  box-shadow: 0 18px 38px rgba(37,99,235,.25);
+}
+
+#dashboard .stat-card.emerald {
+  --card-accent: linear-gradient(90deg,#10b981,#059669);
+  background: linear-gradient(135deg,#ecfdf5 0%,#d9fbe9 100%);
+  border-color: #bbf7d0;
+}
+
+#dashboard .stat-card.purple {
+  --card-accent: linear-gradient(90deg,#8b5cf6,#7c3aed);
+  background: linear-gradient(135deg,#faf5ff 0%,#f0e7ff 100%);
+  border-color: #e9d5ff;
+}
+
+#dashboard .stat-card.amber {
+  --card-accent: linear-gradient(90deg,#f59e0b,#ea580c);
+  background: linear-gradient(135deg,#fffaf0 0%,#ffefd0 100%);
+  border-color: #fed7aa;
+}
+
+#dashboard .stat-card.indigo .stat-icon {
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.25);
+}
+#dashboard .stat-card.indigo .stat-icon svg { stroke: #fff; }
+#dashboard .stat-card.indigo .stat-label,
+#dashboard .stat-card.indigo .stat-value,
+#dashboard .stat-card.indigo .stat-footer { color: #fff; }
+#dashboard .stat-card.indigo .stat-footer { border-top-color: rgba(255,255,255,.30); }
+
+#dashboard .stat-card.emerald .stat-label { color:#047857; }
+#dashboard .stat-card.emerald .stat-value { color:#047857; }
+#dashboard .stat-card.purple .stat-label { color:#6d28d9; }
+#dashboard .stat-card.purple .stat-value { color:#6d28d9; }
+#dashboard .stat-card.amber .stat-label { color:#c2410c; }
+#dashboard .stat-card.amber .stat-value { color:#c2410c; }
+
+/* TOTAL PEGAWAI — paling menonjol */
+#dashboard .stat-card.indigo .stat-label {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .7px;
+}
+#dashboard .stat-card.indigo .stat-value {
+  font-size: clamp(52px, 5vw, 68px);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: .95;
+  text-shadow: 0 4px 18px rgba(0,0,0,.12);
+}
+
+#dashboard .stat-card:not(.indigo) .stat-value {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+#dashboard .stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 45px rgba(15,23,42,.14);
+}
+#dashboard .stat-card.indigo:hover {
+  box-shadow: 0 24px 50px rgba(37,99,235,.32);
+}
+
+/* Header kategori lebih jelas */
+#dashboard .section-header {
+  margin-top: 30px;
+  margin-bottom: 14px;
+}
+#dashboard .section-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: #475569;
+}
+
+/* Kartu kategori lebih modern */
+#dashboard .category-grid {
+  gap: 14px;
+}
+#dashboard .category-card {
+  min-height: 142px;
+  padding: 17px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);
+  box-shadow: 0 10px 26px rgba(15,23,42,.06);
+}
+#dashboard .category-card h4 {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: #475569;
+}
+#dashboard .category-card p {
+  font-size: 30px;
+  font-weight: 900;
+}
+#dashboard .category-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+
+/* Pembeda visual kategori utama vs pendukung */
+#dashboard .section-header:nth-of-type(1) .section-title::before,
+#dashboard .section-header:nth-of-type(2) .section-title::before {
+  width: 5px;
+  height: 19px;
+}
+
+@media (max-width: 760px) {
+  #dashboard .stat-card { min-height: 150px; padding: 14px; }
+  #dashboard .stat-card.indigo .stat-value { font-size: 48px !important; letter-spacing: -2px; }
+  #dashboard .stat-card:not(.indigo) .stat-value { font-size: 34px !important; }
+  #dashboard .stat-card.indigo .stat-label { font-size: 11px; }
+  #dashboard .category-card { min-height: 115px; padding: 12px !important; }
+  #dashboard .category-card p { font-size: 25px !important; }
+}
+</style>
 </head>
 <body>
 
@@ -2780,19 +2942,78 @@ document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); 
     renderPersonalList(filtered);
   };
   window.fetchTableData = function(filter) { var tbody = document.getElementById('table-body'); tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;'><div class='spinner'></div><p style='margin-top:16px;color:var(--text-muted);font-size:13px;'>Memuat data...</p></td></tr>"; if (typeof google === "undefined" || !google.script) { applyFilterAndSort(); return; } var runner = google.script.run.withSuccessHandler(function(res) { var parsed = JSON.parse(res); window.globalData = parsed.employees || []; applyFilterAndSort(); updateSipNotifications(); }); if (filter === "SELURUH" || window.currentActiveType === "SELURUH") runner.getAllPegawaiData(); else runner.getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || ""); };
+  // Mengubah satu pegawai menjadi beberapa baris virtual HANYA untuk tampilan klaster.
+  // Data database tetap satu baris per pegawai; tidak ada penambahan/penggeseran kolom.
+  function getClusterRows(employee, clusterName) {
+    var target = String(clusterName || '').trim().toUpperCase();
+    var rows = [];
+    var base = Object.assign({}, employee);
+    var baseCluster = String(base.klaster || '').trim().toUpperCase();
+
+    if (baseCluster === target) rows.push(base);
+
+    (employee.structure_assignments || []).forEach(function(a) {
+      var aCluster = String(a.klaster || '').trim().toUpperCase();
+      if (aCluster !== target) return;
+
+      var copy = Object.assign({}, employee, {
+        klaster: a.klaster,
+        status_peran: a.status_peran || a.peran_klaster || '',
+        peran_klaster: a.status_peran || a.peran_klaster || '',
+        jabatan_peran_klaster: a.jabatan_peran_klaster || a.penanggung_jawab_dan_koordinator || '',
+        penanggung_jawab_dan_koordinator: a.jabatan_peran_klaster || a.penanggung_jawab_dan_koordinator || '',
+        __structureVirtualRow: true
+      });
+
+      var duplicate = rows.some(function(r) {
+        return String(r.klaster || '').trim().toUpperCase() === String(copy.klaster || '').trim().toUpperCase() &&
+          String(r.status_peran || r.peran_klaster || '').trim() === String(copy.status_peran || copy.peran_klaster || '').trim() &&
+          String(r.jabatan_peran_klaster || r.penanggung_jawab_dan_koordinator || '').trim() === String(copy.jabatan_peran_klaster || copy.penanggung_jawab_dan_koordinator || '').trim();
+      });
+      if (!duplicate) rows.push(copy);
+    });
+
+    return rows;
+  }
+
+  function getAllClusterDisplayValues(employee, field) {
+    var values = [];
+    function add(v) {
+      var s = String(v == null ? '' : v).trim();
+      if (s && values.indexOf(s) === -1) values.push(s);
+    }
+
+    if (field === 'klaster') add(employee.klaster);
+    if (field === 'role') add(employee.status_peran || employee.peran_klaster);
+    if (field === 'job') add(employee.jabatan_peran_klaster || employee.penanggung_jawab_dan_koordinator);
+
+    (employee.structure_assignments || []).forEach(function(a) {
+      if (field === 'klaster') add(a.klaster);
+      if (field === 'role') add(a.status_peran || a.peran_klaster);
+      if (field === 'job') add(a.jabatan_peran_klaster || a.penanggung_jawab_dan_koordinator);
+    });
+
+    return values.length ? values.join(' • ') : '-';
+  }
+
   window.applyFilterAndSort = function() {
     if(!window.globalData) return;
     var data = [];
+
     if (window.currentActiveType && window.currentActiveType !== "SELURUH") {
       if (window.currentActiveType.indexOf("KLASTER:") === 0) {
         var clusterName = window.currentActiveType.substring(8);
-        data = window.globalData.filter(function(e) {
-          return String(e.klaster || "").trim().toUpperCase() === clusterName.toUpperCase();
+        window.globalData.forEach(function(e) {
+          data = data.concat(getClusterRows(e, clusterName));
         });
       } else {
         data = window.globalData.filter(function(e) { return e.status === window.currentActiveType; });
       }
-    } else { data = window.globalData.slice(); }
+    } else {
+      // Menu Semua Pegawai tetap satu baris per pegawai.
+      data = window.globalData.slice();
+    }
+
     var filterJabatan = document.getElementById('filter-jabatan').value;
     if (filterJabatan !== "ALL") {
       data = data.filter(function(e) {
@@ -2802,11 +3023,13 @@ document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); 
         return jab.indexOf(filterJabatan) >= 0;
       });
     }
+
     var sortValue = document.getElementById('sort-data').value;
     if (sortValue === "NAMA_ASC") data.sort(function(a, b) { return (a.nama || '').localeCompare(b.nama || ''); });
     else if (sortValue === "NAMA_DESC") data.sort(function(a, b) { return (b.nama || '').localeCompare(a.nama || ''); });
     else if (sortValue === "USIA_ASC") data.sort(function(a, b) { return parseInt(a.usia || 0) - parseInt(b.usia || 0); });
     else if (sortValue === "USIA_DESC") data.sort(function(a, b) { return parseInt(b.usia || 0) - parseInt(a.usia || 0); });
+
     window.currentFilteredData = data;
     renderTableRows(data);
   };
@@ -2815,7 +3038,7 @@ document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); 
   window.renderTableRows = function(items) {
     var tbody = document.getElementById('table-body'); items = items || []; if (items.length === 0) { tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;color:var(--text-muted);'>Tidak ada data pegawai</td></tr>"; return; }
     tbody.innerHTML = items.map(function(e, i) { var statusClass = (e.status || '').toLowerCase(); var actions = ''; if (isAdmin()) { actions += '<button type="button" class="action-icon" onclick="editPegawai(\'' + escapeAttr(e.nik) + '\')" title="Edit data pegawai" aria-label="Edit data pegawai"><i data-lucide="pencil-line"></i></button>'; actions += '<button type="button" class="action-icon mutasi" onclick="promptMutasi(\'' + escapeAttr(e.nik) + '\', \'' + escapeAttr(e.nama) + '\')" title="Mutasi pegawai" aria-label="Mutasi pegawai"><i data-lucide="repeat-2"></i></button>'; actions += '<button type="button" class="action-icon delete" onclick="hapusPegawai(\'' + escapeAttr(e.nik) + '\', \'' + escapeAttr(e.nama) + '\')" title="Hapus data pegawai" aria-label="Hapus data pegawai"><i data-lucide="trash-2"></i></button>'; } else { actions = '<span style="color:var(--text-muted);font-size:11px;">Lihat saja</span>'; }
-      return '<tr ' + (isAdmin() ? 'draggable="true"' : '') + ' data-nik="' + escapeAttr(e.nik) + '"><td class="drag-handle">' + (isAdmin() ? '::' : '') + '</td><td class="row-no">' + (i + 1) + '</td><td>' + actions + '</td><td><b>' + safeText(e.nama) + '</b></td><td>' + safeText(e.nik) + '</td><td><span class="cluster-badge">' + safeText(e.klaster || '-') + '</span></td><td><span class="cluster-role-badge">' + safeText(e.status_peran || e.peran_klaster || '-') + '</span></td><td>' + safeText(e.jabatan_peran_klaster || e.penanggung_jawab_dan_koordinator || '-') + '</td><td>' + safeText(e.nip) + '</td><td>' + safeText(e.no_kk) + '</td><td>' + safeText(e.jk) + '</td><td>' + safeText(e.agama) + '</td><td>' + safeText(e.status_kawin) + '</td><td>' + safeText(e.tempat_lahir) + '</td><td>' + safeText(e.tanggal_lahir) + '</td><td><b>' + safeText(e.usia) + '</b></td><td><span class="status-badge ' + statusClass + '">' + safeText(e.status) + '</span></td><td>' + safeText(e.alamat_domisili) + '</td><td>' + safeText(e.alamat_ktp) + '</td><td>' + safeText(e.pangkat) + '</td><td>' + safeText(e.golongan) + '</td><td>' + safeText(e.tmt_golongan) + '</td><td>' + safeText(e.jabatan) + '</td><td>' + safeText(e.tmt_jabatan) + '</td><td>' + safeText(e.tmt_cpns) + '</td><td>' + safeText(e.tmt_pns) + '</td><td>' + safeText(e.tmt_puskesmas) + '</td><td><b>' + safeText(e.mkASN) + '</b></td><td><b>' + safeText(e.mkPusk) + '</b></td><td>' + safeText(e.pendidikan) + '</td><td>' + safeText(e.jurusan) + '</td><td>' + safeText(e.sekolah) + '</td><td>' + safeText(e.tgl_lulus) + '</td><td>' + safeText(e.no_ijazah) + '</td><td>' + safeText(e.no_hp) + '</td><td>' + safeText(e.email) + '</td><td>' + safeText(e.bpjs_kes) + '</td><td>' + safeText(e.bpjs_ket) + '</td><td>' + safeText(e.npwp) + '</td><td>' + safeText(e.karpeg) + '</td><td>' + safeText(e.karsu) + '</td><td>' + safeText(e.no_rek) + '</td><td>' + safeText(e.no_str) + '</td><td>' + safeText(e.tgl_str) + '</td><td>' + safeText(e.berlaku_str) + '</td><td>' + safeText(e.no_sip) + '</td><td>' + safeText(e.tgl_sip) + '</td><td>' + safeText(e.berlaku_sip) + '</td><td>' + safeText(e.nama_pasangan) + '</td><td>' + safeText(e.jml_anak) + '</td><td>' + safeText(e.no_kontak_saudara) + '</td><td><b>' + safeText(e.pensiun) + '</b></td></tr>';
+      return '<tr ' + (isAdmin() ? 'draggable="true"' : '') + ' data-nik="' + escapeAttr(e.nik) + '"><td class="drag-handle">' + (isAdmin() ? '::' : '') + '</td><td class="row-no">' + (i + 1) + '</td><td>' + actions + '</td><td><b>' + safeText(e.nama) + '</b></td><td>' + safeText(e.nik) + '</td><td><span class="cluster-badge">' + safeText(e.__structureVirtualRow ? (e.klaster || '-') : getAllClusterDisplayValues(e, 'klaster')) + '</span></td><td><span class="cluster-role-badge">' + safeText(e.__structureVirtualRow ? (e.status_peran || e.peran_klaster || '-') : getAllClusterDisplayValues(e, 'role')) + '</span></td><td>' + safeText(e.__structureVirtualRow ? (e.jabatan_peran_klaster || e.penanggung_jawab_dan_koordinator || '-') : getAllClusterDisplayValues(e, 'job')) + '</td><td>' + safeText(e.nip) + '</td><td>' + safeText(e.no_kk) + '</td><td>' + safeText(e.jk) + '</td><td>' + safeText(e.agama) + '</td><td>' + safeText(e.status_kawin) + '</td><td>' + safeText(e.tempat_lahir) + '</td><td>' + safeText(e.tanggal_lahir) + '</td><td><b>' + safeText(e.usia) + '</b></td><td><span class="status-badge ' + statusClass + '">' + safeText(e.status) + '</span></td><td>' + safeText(e.alamat_domisili) + '</td><td>' + safeText(e.alamat_ktp) + '</td><td>' + safeText(e.pangkat) + '</td><td>' + safeText(e.golongan) + '</td><td>' + safeText(e.tmt_golongan) + '</td><td>' + safeText(e.jabatan) + '</td><td>' + safeText(e.tmt_jabatan) + '</td><td>' + safeText(e.tmt_cpns) + '</td><td>' + safeText(e.tmt_pns) + '</td><td>' + safeText(e.tmt_puskesmas) + '</td><td><b>' + safeText(e.mkASN) + '</b></td><td><b>' + safeText(e.mkPusk) + '</b></td><td>' + safeText(e.pendidikan) + '</td><td>' + safeText(e.jurusan) + '</td><td>' + safeText(e.sekolah) + '</td><td>' + safeText(e.tgl_lulus) + '</td><td>' + safeText(e.no_ijazah) + '</td><td>' + safeText(e.no_hp) + '</td><td>' + safeText(e.email) + '</td><td>' + safeText(e.bpjs_kes) + '</td><td>' + safeText(e.bpjs_ket) + '</td><td>' + safeText(e.npwp) + '</td><td>' + safeText(e.karpeg) + '</td><td>' + safeText(e.karsu) + '</td><td>' + safeText(e.no_rek) + '</td><td>' + safeText(e.no_str) + '</td><td>' + safeText(e.tgl_str) + '</td><td>' + safeText(e.berlaku_str) + '</td><td>' + safeText(e.no_sip) + '</td><td>' + safeText(e.tgl_sip) + '</td><td>' + safeText(e.berlaku_sip) + '</td><td>' + safeText(e.nama_pasangan) + '</td><td>' + safeText(e.jml_anak) + '</td><td>' + safeText(e.no_kontak_saudara) + '</td><td><b>' + safeText(e.pensiun) + '</b></td></tr>';
     }).join(''); if (isAdmin()) initDragAndDrop(); forceRefreshIcons();
   };
   // editPegawai kini KHUSUS ADMIN. Pegawai biasa (termasuk untuk data dirinya sendiri)
@@ -2993,8 +3216,14 @@ window.kembalikanMutasi = function(nik, nama) {
       if (value && value.name && value.size !== undefined) return;
       formDataObj[key] = value;
     });
-    if (typeof window.getAdditionalStructureAssignments === 'function') {
+    // Penugasan multi-klaster disimpan terpisah dari Data_Pegawai.
+    // Marker ini memastikan backend hanya mengganti data struktur jika editor
+    // benar-benar ada/siap. Jika editor gagal dimuat, struktur lama dipertahankan.
+    if (typeof window.getAdditionalStructureAssignments === 'function' && document.getElementById('struktur-tambahan-editor')) {
       formDataObj.struktur_tambahan_json = JSON.stringify(window.getAdditionalStructureAssignments());
+      formDataObj.struktur_tambahan_editor_ready = '1';
+    } else {
+      formDataObj.struktur_tambahan_editor_ready = '0';
     }
     var strSelect = document.getElementById('berlaku_str_select');
     if (strSelect && strSelect.value === 'custom') {
@@ -3121,7 +3350,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function role2(e){var r=String(e.status_peran||e.peran_klaster||'').toLowerCase(),j=String(e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'').toLowerCase();if(r.indexOf('penanggung')>=0||r.indexOf('pj')>=0||j.indexOf('penanggung')>=0)return 'pj';if(r.indexOf('koordinator')>=0||j.indexOf('koordinator')>=0)return 'koor';return 'anggota';}
   function desc2(e){return e.jabatan_peran_klaster||e.penanggung_jawab_dan_koordinator||'';}
   function img2(e){return e.foto_url||'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto';}
-  function structureRows2(employees){var out=[];employees.forEach(function(employee){var base=Object.assign({},employee);out.push(base);(employee.structure_assignments||[]).forEach(function(assignment){var copy=Object.assign({},employee,assignment);var same=String(copy.klaster||'').trim()===String(base.klaster||'').trim()&&String(copy.status_peran||copy.peran_klaster||'').trim()===String(base.status_peran||base.peran_klaster||'').trim()&&String(copy.jabatan_peran_klaster||copy.penanggung_jawab_dan_koordinator||'').trim()===String(base.jabatan_peran_klaster||base.penanggung_jawab_dan_koordinator||'').trim();if(!same)out.push(copy);});});return out;}
+  function structureRows2(employees){var out=[];employees.forEach(function(employee){var base=Object.assign({},employee);if(String(base.klaster||'').trim())out.push(base);(employee.structure_assignments||[]).forEach(function(assignment){var copy=Object.assign({},employee,{klaster:assignment.klaster,status_peran:assignment.status_peran||assignment.peran_klaster||'',peran_klaster:assignment.status_peran||assignment.peran_klaster||'',jabatan_peran_klaster:assignment.jabatan_peran_klaster||assignment.penanggung_jawab_dan_koordinator||'',penanggung_jawab_dan_koordinator:assignment.jabatan_peran_klaster||assignment.penanggung_jawab_dan_koordinator||''});var same=String(copy.klaster||'').trim()===String(base.klaster||'').trim()&&String(copy.status_peran||copy.peran_klaster||'').trim()===String(base.status_peran||base.peran_klaster||'').trim()&&String(copy.jabatan_peran_klaster||copy.penanggung_jawab_dan_koordinator||'').trim()===String(base.jabatan_peran_klaster||base.penanggung_jawab_dan_koordinator||'').trim();if(!same)out.push(copy);});});return out;}
   function node2(e,t){var label=t==='pj'?'PENANGGUNG JAWAB':t==='koor'?'KOORDINATOR':'ANGGOTA KLASTER';return '<div class="simpeg-org-node '+t+'"><img src="'+esc2(img2(e))+'" onerror="this.src=\'https://via.placeholder.com/96x112/6366f1/ffffff?text=Foto\'"><div class="r">'+label+'</div><div class="n">'+esc2(e.nama||'-')+'</div>'+(desc2(e)?'<div class="d">'+esc2(desc2(e))+'</div>':'')+'</div>';}
   function draw(cluster){
     var root=document.getElementById('simpeg-org-page'); if(!root)return;
@@ -3199,9 +3428,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if (!root) return;
     var data = [];
     (window.globalData || []).forEach(function (employee) {
-      var base = Object.assign({}, employee); data.push(base);
+      var base = Object.assign({}, employee); if (String(base.klaster || '').trim()) data.push(base);
       (employee.structure_assignments || []).forEach(function (assignment) {
-        var copy = Object.assign({}, employee, assignment);
+        var copy = Object.assign({}, employee, {
+          klaster: assignment.klaster,
+          status_peran: assignment.status_peran || assignment.peran_klaster || '',
+          peran_klaster: assignment.status_peran || assignment.peran_klaster || '',
+          jabatan_peran_klaster: assignment.jabatan_peran_klaster || assignment.penanggung_jawab_dan_koordinator || '',
+          penanggung_jawab_dan_koordinator: assignment.jabatan_peran_klaster || assignment.penanggung_jawab_dan_koordinator || ''
+        });
         var same = String(copy.klaster || '').trim() === String(base.klaster || '').trim() && String(copy.status_peran || copy.peran_klaster || '').trim() === String(base.status_peran || base.peran_klaster || '').trim() && String(copy.jabatan_peran_klaster || copy.penanggung_jawab_dan_koordinator || '').trim() === String(base.jabatan_peran_klaster || base.penanggung_jawab_dan_koordinator || '').trim();
         if (!same) data.push(copy);
       });
@@ -3342,4 +3577,3 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 </body>
 </html>
-
