@@ -2346,11 +2346,11 @@ window.currentFilteredData = [];
 window.globalData = [];
 
 function forceRefreshIcons() {
-  setTimeout(() => { if (typeof lucide !== "undefined") lucide.createIcons(); }, 50);
+  requestAnimationFrame(() => { if (typeof lucide !== "undefined") lucide.createIcons(); });
 }
 
 function animateCounter(element, target) {
-  const duration = 800;
+  const duration = 450;
   const start = parseInt(element.innerText) || 0;
   const end = parseInt(target) || 0;
   const startTime = performance.now();
@@ -2424,7 +2424,7 @@ function showSection(id) {
     if(targetBtn) targetBtn.classList.add('active-menu');
     document.getElementById('filter-jabatan').value = "ALL";
     document.getElementById('sort-data').value = "MANUAL";
-    fetchTableData(window.currentActiveType);
+    fetchTableData(window.currentActiveType, false);
   } else {
     document.getElementById(id).classList.add('active');
     const targetBtn = document.getElementById('m-' + id);
@@ -2876,17 +2876,36 @@ document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); 
 };
   // Dashboard selalu memuat data SELURUH pegawai (baik Admin maupun Pegawai),
   // karena statistik total pegawai wajib sama untuk semua akun.
-  window.loadDashboard = function() {
-  console.log("loadDashboard() DIPANGGIL");
+  window.loadDashboard = function(force) {
+  // Satu request dipakai untuk Dashboard + tabel + pencarian.
+  // Tidak meminta data yang sama berulang kali saat pindah menu.
+  var now = Date.now();
+  if (!force && window.globalData && window.globalData.length && window.dataLoadedAt && (now - window.dataLoadedAt < 45000)) {
+    hydrateDashboard(window.lastDashboardResponse || {stats:{}, employees:window.globalData});
+    return;
+  }
+  if (window.dashboardLoading) return;
   if (typeof google === "undefined" || !google.script) { forceRefreshIcons(); return; }
+
+  window.dashboardLoading = true;
   google.script.run
     .withSuccessHandler(function(res) {
-      console.log("DASHBOARD RESPONSE (raw):", res);
-      var parsed = JSON.parse(res);
-      hydrateDashboard(parsed);
+      window.dashboardLoading = false;
+      try {
+        var parsed = typeof res === "string" ? JSON.parse(res) : (res || {});
+        window.lastDashboardResponse = parsed;
+        window.globalData = parsed.employees || [];
+        window.dataLoadedAt = Date.now();
+        hydrateDashboard(parsed);
+      } catch (e) {
+        console.error("Dashboard parse error:", e);
+        showToast("Data dashboard tidak dapat dibaca.", "error");
+      }
     })
     .withFailureHandler(function(err) {
-      console.log("DASHBOARD ERROR:", err.message, err);
+      window.dashboardLoading = false;
+      console.error("DASHBOARD ERROR:", err);
+      showToast("Gagal memuat dashboard: " + (err.message || err), "error");
     })
     .getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || "");
 };
@@ -2941,7 +2960,49 @@ document.addEventListener("DOMContentLoaded", function() { forceRefreshIcons(); 
 
     renderPersonalList(filtered);
   };
-  window.fetchTableData = function(filter) { var tbody = document.getElementById('table-body'); tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;'><div class='spinner'></div><p style='margin-top:16px;color:var(--text-muted);font-size:13px;'>Memuat data...</p></td></tr>"; if (typeof google === "undefined" || !google.script) { applyFilterAndSort(); return; } var runner = google.script.run.withSuccessHandler(function(res) { var parsed = JSON.parse(res); window.globalData = parsed.employees || []; applyFilterAndSort(); updateSipNotifications(); }); if (filter === "SELURUH" || window.currentActiveType === "SELURUH") runner.getAllPegawaiData(); else runner.getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || ""); };
+  window.fetchTableData = function(filter, force) {
+  var tbody = document.getElementById('table-body');
+  if (!window.globalData || !window.globalData.length) {
+    tbody.innerHTML = "<tr><td colspan='50' style='text-align:center;padding:60px;'><div class='spinner'></div><p style='margin-top:16px;color:var(--text-muted);font-size:13px;'>Memuat data...</p></td></tr>";
+  }
+
+  // Jika data dashboard masih segar, cukup render ulang di browser.
+  if (!force && window.globalData && window.dataLoadedAt && (Date.now() - window.dataLoadedAt < 45000)) {
+    applyFilterAndSort();
+    updateSipNotifications();
+    return;
+  }
+
+  if (typeof google === "undefined" || !google.script) {
+    applyFilterAndSort();
+    return;
+  }
+
+  if (window.tableDataLoading) return;
+  window.tableDataLoading = true;
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      window.tableDataLoading = false;
+      try {
+        var parsed = typeof res === "string" ? JSON.parse(res) : (res || {});
+        window.lastDashboardResponse = parsed;
+        window.globalData = parsed.employees || [];
+        window.dataLoadedAt = Date.now();
+        applyFilterAndSort();
+        updateSipNotifications();
+      } catch (e) {
+        console.error("Table data parse error:", e);
+        showToast("Data pegawai tidak dapat dibaca.", "error");
+      }
+    })
+    .withFailureHandler(function(err) {
+      window.tableDataLoading = false;
+      console.error("TABLE ERROR:", err);
+      showToast("Gagal memuat data pegawai: " + (err.message || err), "error");
+    })
+    .getDashboardData(window.currentUserRole || "SuperAdmin", window.currentUserNik || "");
+};
   // Mengubah satu pegawai menjadi beberapa baris virtual HANYA untuk tampilan klaster.
   // Data database tetap satu baris per pegawai; tidak ada penambahan/penggeseran kolom.
   function getClusterRows(employee, clusterName) {
@@ -3163,7 +3224,7 @@ document.addEventListener('click', function(e) {
     showToast(res.message, res.status === 'success' ? 'success' : 'error');
     loadDashboard();
     if (document.querySelector('.section.active') && document.querySelector('.section.active').id === 'view-section') {
-      fetchTableData(window.currentActiveType);
+      fetchTableData(window.currentActiveType, false);
     }
   }).withFailureHandler(function(err) {
     showToast('Gagal memutasi pegawai: ' + err.message, 'error');
@@ -3426,9 +3487,45 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function renderIlp() {
     var root = document.getElementById('simpeg-org-page');
     if (!root) return;
+
+    var employees = Array.isArray(window.globalData) ? window.globalData : [];
     var data = [];
-    (window.globalData || []).forEach(function (employee) {
-      var base = Object.assign({}, employee); if (String(base.klaster || '').trim()) data.push(base);
+    var leaders = [];
+
+    // Normalisasi teks agar variasi penulisan seperti:
+    // "Kepala Puskesmas", "Kepala  Puskesmas", atau "Kepala Puskesmas UPTD"
+    // tetap dikenali sebagai pimpinan ILP.
+    function textOf(value) {
+      return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+    }
+
+    function isKepalaPuskesmas(employee) {
+      var text = [
+        employee.jabatan,
+        employee.status_peran,
+        employee.peran_klaster,
+        employee.jabatan_peran_klaster,
+        employee.penanggung_jawab_dan_koordinator
+      ].map(textOf).join(' ');
+      return /kepala\s+puskesmas/i.test(text);
+    }
+
+    // PENTING:
+    // Kepala Puskesmas dicari dari seluruh Data Pegawai, BUKAN dari "data"
+    // yang hanya berisi pegawai yang mempunyai klaster.
+    // Jadi Kepala Puskesmas tetap tampil walaupun kolom Klaster kosong.
+    employees.forEach(function (employee) {
+      if (isKepalaPuskesmas(employee)) {
+        leaders.push(Object.assign({}, employee, {
+          status_peran: 'Kepala Puskesmas',
+          peran_klaster: 'Kepala Puskesmas',
+          jabatan_peran_klaster: textOf(employee.jabatan) || 'Kepala Puskesmas'
+        }));
+      }
+
+      var base = Object.assign({}, employee);
+      if (textOf(base.klaster)) data.push(base);
+
       (employee.structure_assignments || []).forEach(function (assignment) {
         var copy = Object.assign({}, employee, {
           klaster: assignment.klaster,
@@ -3437,17 +3534,79 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
           jabatan_peran_klaster: assignment.jabatan_peran_klaster || assignment.penanggung_jawab_dan_koordinator || '',
           penanggung_jawab_dan_koordinator: assignment.jabatan_peran_klaster || assignment.penanggung_jawab_dan_koordinator || ''
         });
-        var same = String(copy.klaster || '').trim() === String(base.klaster || '').trim() && String(copy.status_peran || copy.peran_klaster || '').trim() === String(base.status_peran || base.peran_klaster || '').trim() && String(copy.jabatan_peran_klaster || copy.penanggung_jawab_dan_koordinator || '').trim() === String(base.jabatan_peran_klaster || base.penanggung_jawab_dan_koordinator || '').trim();
-        if (!same) data.push(copy);
+
+        // Jangan masukkan Kepala Puskesmas sebagai anggota klaster lagi.
+        // Posisi Kepala Puskesmas hanya ditampilkan di bagian paling atas.
+        if (isKepalaPuskesmas(copy)) return;
+
+        var same =
+          textOf(copy.klaster).toLowerCase() === textOf(base.klaster).toLowerCase() &&
+          textOf(copy.status_peran || copy.peran_klaster).toLowerCase() ===
+            textOf(base.status_peran || base.peran_klaster).toLowerCase() &&
+          textOf(copy.jabatan_peran_klaster || copy.penanggung_jawab_dan_koordinator).toLowerCase() ===
+            textOf(base.jabatan_peran_klaster || base.penanggung_jawab_dan_koordinator).toLowerCase();
+
+        if (!same && textOf(copy.klaster)) data.push(copy);
       });
     });
-    // \s adalah karakter spasi pada regular expression. Dengan ini, nilai
-    // "Kepala Puskesmas" dari Status Peran maupun Jabatan dikenali sebagai pimpinan ILP.
-    var leader = data.find(function (employee) { return /kepala\s+puskesmas/i.test(String(employee.jabatan || '') + ' ' + String(employee.status_peran || employee.peran_klaster || '') + ' ' + String(employee.jabatan_peran_klaster || '')); });
-    var leaderHtml = leader ? node(leader, 'pj') : '<div class="simpeg-ilp-empty">Kepala Puskesmas belum ditandai pada data pegawai.</div>';
-    root.innerHTML = '<div class="simpeg-org-page-shell"><div class="simpeg-org-toolbar"><div class="simpeg-org-tabs"><button type="button" class="simpeg-org-tab active" data-ilp-tab="true">Struktur ILP</button>' + clusters.map(function (cluster) { return '<button type="button" class="simpeg-org-tab" data-cluster="' + esc(cluster) + '">' + esc(cluster) + '</button>'; }).join('') + '</div><div class="simpeg-org-count">Bagan gabungan 5 klaster</div></div><div class="simpeg-ilp-wrap"><div class="simpeg-ilp-hero"><div class="simpeg-ilp-kicker">INTEGRASI LAYANAN PRIMER</div><h2 class="simpeg-ilp-title">Struktur Organisasi ILP</h2><div class="simpeg-ilp-subtitle">UPTD Puskesmas Bojongsari — Klaster 1 s.d. 4 dan Lintas Klaster</div></div><div class="simpeg-ilp-leader">' + leaderHtml + '</div><div class="simpeg-ilp-line"></div><div class="simpeg-ilp-grid">' + clusters.map(function (cluster) { return clusterColumn(cluster, data.filter(function (employee) { return String(employee.klaster || '').trim().toLowerCase() === cluster.toLowerCase(); })); }).join('') + '</div></div></div>';
-    root.querySelectorAll('[data-cluster]').forEach(function (button) { button.addEventListener('click', function () { window.__simpegOrgCluster = button.getAttribute('data-cluster'); window.showSection('struktur-organisasi'); }); });
+
+    // Ambil Kepala Puskesmas pertama yang ditemukan.
+    // Jika ternyata ada lebih dari satu data yang cocok, tetap hanya satu
+    // yang ditampilkan agar bagan tidak menggandakan pimpinan.
+    var leader = leaders.length ? leaders[0] : null;
+
+    var leaderHtml = leader
+      ? node(leader, 'pj')
+      : '<div class="simpeg-ilp-empty">Kepala Puskesmas belum ditandai pada data pegawai.</div>';
+
+    root.innerHTML =
+      '<div class="simpeg-org-page-shell">' +
+        '<div class="simpeg-org-toolbar">' +
+          '<div class="simpeg-org-tabs">' +
+            '<button type="button" class="simpeg-org-tab active" data-ilp-tab="true">Struktur ILP</button>' +
+            clusters.map(function (cluster) {
+              return '<button type="button" class="simpeg-org-tab" data-cluster="' +
+                esc(cluster) + '">' + esc(cluster) + '</button>';
+            }).join('') +
+          '</div>' +
+          '<div class="simpeg-org-count">Bagan gabungan 5 klaster</div>' +
+        '</div>' +
+
+        '<div class="simpeg-ilp-wrap">' +
+          '<div class="simpeg-ilp-hero">' +
+            '<div class="simpeg-ilp-kicker">INTEGRASI LAYANAN PRIMER</div>' +
+            '<h2 class="simpeg-ilp-title">Struktur Organisasi ILP</h2>' +
+            '<div class="simpeg-ilp-subtitle">UPTD Puskesmas Bojongsari — Klaster 1 s.d. 4 dan Lintas Klaster</div>' +
+          '</div>' +
+
+          '<div class="simpeg-ilp-leader">' +
+            '<div class="simpeg-ilp-leader-label">KEPALA PUSKESMAS</div>' +
+            leaderHtml +
+          '</div>' +
+
+          '<div class="simpeg-ilp-line"></div>' +
+
+          '<div class="simpeg-ilp-grid">' +
+            clusters.map(function (cluster) {
+              return clusterColumn(
+                cluster,
+                data.filter(function (employee) {
+                  return textOf(employee.klaster).toLowerCase() === cluster.toLowerCase();
+                })
+              );
+            }).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    root.querySelectorAll('[data-cluster]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        window.__simpegOrgCluster = button.getAttribute('data-cluster');
+        window.showSection('struktur-organisasi');
+      });
+    });
   }
+
   function addIlpTab() {
     var root = document.getElementById('simpeg-org-page');
     if (!root || root.querySelector('[data-ilp-tab]')) return;
